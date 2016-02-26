@@ -7,7 +7,7 @@ var space = function() {
 }
 
 var host = function() {
-    if (location.host == 'production') {
+    if (location.host == 'admin.tally.us') {
         return 'https://api.tally.us'
     } else {
         return 'http://localhost:5000'

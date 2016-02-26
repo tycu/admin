@@ -3,7 +3,6 @@
 window.onload = function() {
     var content = document.getElementById('content')
     var name = document.getElementById('name')
-    var thumbnailUrl = document.getElementById('thumbnailUrl')
     var submit = document.getElementById('submit')
     var error = document.getElementById('error')
 
@@ -19,7 +18,6 @@ window.onload = function() {
                 politician = res
                 document.title = 'Update ' + politician.name + ' - Tally'
                 name.value = politician.name || ''
-                thumbnailUrl.value = politician.thumbnailUrl || ''
                 submit.disabled = false
             } else {
                 content.innerHTML = 'Unable to load politician'
@@ -32,7 +30,6 @@ window.onload = function() {
         error.textContent = ''
 
         politician.name = name.value
-        politician.thumbnailUrl = thumbnailUrl.value
 
         var endpoint = '/v1/politicians'
         if (politician.iden) {
