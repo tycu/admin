@@ -1,3 +1,3 @@
-Deploy: (rsync to delete unused, cp to update with gzipped versions where appropriate)
+Deploy:
 
 `gsutil -m rsync -d -r _site gs://admin.tally.us/`
