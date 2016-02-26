@@ -43,7 +43,7 @@ window.onload = function() {
             submit.disabled = false
 
             if (res) {
-                window.location.replace('/tools/politician.html?iden=' + res.iden)
+                window.location.replace('/politician.html?iden=' + res.iden)
             } else {
                 error.textContent = 'Save failed'
             }

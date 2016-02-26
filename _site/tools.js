@@ -16,7 +16,7 @@ var host = function() {
 
 document.addEventListener('DOMContentLoaded', function(event) {
     var title = document.createElement('a')
-    title.href = '/tools'
+    title.href = '/'
     title.id = 'title'
     title.textContent = 'Tally'
 

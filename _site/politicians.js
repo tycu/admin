@@ -10,7 +10,7 @@ window.onload = function() {
                 p.textContent = politician.name + ' '
 
                 var edit = document.createElement('a')
-                edit.href = '/tools/politician.html?iden=' + politician.iden
+                edit.href = '/politician.html?iden=' + politician.iden
                 edit.style.fontWeight = 'bold'
                 edit.textContent = 'Edit'
 

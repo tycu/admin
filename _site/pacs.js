@@ -7,7 +7,7 @@ window.onload = function() {
         if (res) {
             res.pacs.forEach(function(pac) {
                 var edit = document.createElement('a')
-                edit.href = '/tools/pac.html?iden=' + pac.iden
+                edit.href = '/pac.html?iden=' + pac.iden
                 edit.style.fontWeight = 'bold'
                 edit.textContent = 'Edit'
 
