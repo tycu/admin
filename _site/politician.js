@@ -3,10 +3,16 @@
 window.onload = function() {
     var content = document.getElementById('content')
     var name = document.getElementById('name')
+    var thumbnail = document.getElementById('thumbnail')
+    var progress = document.getElementById('progress')
+    var fileInput = document.getElementById('fileInput')
     var submit = document.getElementById('submit')
     var error = document.getElementById('error')
 
     var politician = {}
+
+    var size = thumbnail.clientWidth
+    var imgixConfig = '?dpr=' + devicePixelRatio + '&h=' + size + '&w=' + size + '&fit=crop&crop=faces&mask=ellipse'
 
     if (location.query['iden']) {
         submit.textContent = 'Update'
@@ -18,11 +24,51 @@ window.onload = function() {
                 politician = res
                 document.title = 'Update ' + politician.name + ' - Tally'
                 name.value = politician.name || ''
+                thumbnail.src = politician.thumbnailUrl && politician.thumbnailUrl + imgixConfig || ''
                 submit.disabled = false
             } else {
                 content.innerHTML = 'Unable to load politician'
             }
         })
+    }
+
+    thumbnail.onclick = function() {
+        fileInput.click()
+    }
+
+    fileInput.onchange = function(e) {
+        if (!e.target.files) {
+            return
+        }
+
+        var file = e.target.files[0]
+        if (!file) {
+            return
+        }
+
+        progress.style.display = 'block'
+        thumbnail.src = ''
+
+        var url = host() + '/internal/upload-image?fileType=' + encodeURIComponent(file.type)
+        var xhr = new XMLHttpRequest()
+        xhr.open("POST", url, true)
+        xhr.setRequestHeader('Accept', 'application/json')
+        xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.adminKey)
+        xhr.upload.onprogress = function(e) {
+            var percent = Math.floor((e.loaded / e.total) * 100)
+            progress.textContent = percent + '%'
+        }
+        xhr.onload = function(e) {
+            progress.style.display = 'none'
+
+            var response = JSON.parse(e.target.responseText)
+            politician.thumbnailUrl = response.imageUrl
+            thumbnail.src = politician.thumbnailUrl + imgixConfig
+        }
+        xhr.onerror = function() {
+            progress.style.display = 'none'
+        }
+        xhr.send(file)
     }
 
     submit.onclick = function() {

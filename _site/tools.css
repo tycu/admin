@@ -27,6 +27,11 @@ textarea {
     height: 100px;    
 }
 
+img {
+    display: inline-block;
+    border: 0;
+}
+
 #header {
     padding: 14px;
     background-color: #663399;
@@ -43,4 +48,8 @@ textarea {
 
 #content {
     margin: 14px;
+}
+
+.pointer {
+    cursor: pointer;
 }

@@ -10,6 +10,10 @@
 </head>
 <body>
     <div id="content">
+        <div style="position:relative;width:414px;height:200px;">
+            <img id="image" class="pointer" height="100%" width="100%">
+            <div id="progress" style="position:absolute;top:0;bottom:0;left:0;right:0;text-align:center;display:none;"></div>
+        </div>
         <p>
             Politician:
             <select id="politicians"></select>
@@ -18,6 +22,7 @@
         <textarea id="summary" placeholder="Dek"></textarea>
         <button id="submit">Add</button>
         <div id="error"></div>
+        <input type="file" id="fileInput" accept="image/jpeg, image/png" style="display:none;">
     </div>
 </body>
 </html>
