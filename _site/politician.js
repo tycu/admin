@@ -3,6 +3,7 @@
 window.onload = function() {
     var content = document.getElementById('content')
     var name = document.getElementById('name')
+    var jobTitle = document.getElementById('jobTitle')
     var thumbnail = document.getElementById('thumbnail')
     var progress = document.getElementById('progress')
     var fileInput = document.getElementById('fileInput')
@@ -24,6 +25,7 @@ window.onload = function() {
                 politician = res
                 document.title = 'Update ' + politician.name + ' - Tally'
                 name.value = politician.name || ''
+                jobTitle.value = politician.jobTitle || ''
                 thumbnail.src = politician.thumbnailUrl && politician.thumbnailUrl + imgixConfig || ''
                 submit.disabled = false
             } else {
@@ -76,6 +78,7 @@ window.onload = function() {
         error.textContent = ''
 
         politician.name = name.value
+        politician.jobTitle = jobTitle.value
 
         var endpoint = '/v1/politicians'
         if (politician.iden) {
