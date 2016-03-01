@@ -1,3 +1,5 @@
+'use strict'
+
 var async = require("async")
 
 module.exports = function(entities, gcloud) {
@@ -56,8 +58,8 @@ module.exports = function(entities, gcloud) {
                 }
             })
 
-            var bucket = gcloud.storage().bucket('static.tally.us');
-            var file = bucket.file('data/events.json');
+            var bucket = gcloud.storage().bucket('generated.tally.us');
+            var file = bucket.file('v1/events/recent.json');
 
             var stream = new require('stream').Readable()
             stream._read = function(){};

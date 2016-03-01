@@ -1,3 +1,5 @@
+'use strict'
+
 var workers = process.env.WEB_CONCURRENCY || 1
 var port = process.env.PORT || 5001
 
