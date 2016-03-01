@@ -16,10 +16,11 @@ window.onload = function() {
     var imgixConfig = '?dpr=' + devicePixelRatio + '&h=' + size + '&w=' + size + '&fit=crop&crop=faces&mask=ellipse'
 
     if (location.query['iden']) {
+        content.style.display = 'none'
         submit.textContent = 'Update'
         submit.disabled = true
 
-        get(host() + '/v1/politicians/' + location.query['iden'], function(res) {
+        post('/get-politician', { 'iden': location.query['iden'] }, function(res) {
             if (res) {
                 console.log(res)
                 politician = res
@@ -28,6 +29,7 @@ window.onload = function() {
                 jobTitle.value = politician.jobTitle || ''
                 thumbnail.src = politician.thumbnailUrl && politician.thumbnailUrl + imgixConfig || ''
                 submit.disabled = false
+                content.style.display = 'block'
             } else {
                 content.innerHTML = 'Unable to load politician'
             }
@@ -51,7 +53,7 @@ window.onload = function() {
         progress.style.display = 'block'
         thumbnail.src = ''
 
-        var url = host() + '/internal/upload-image?fileType=' + encodeURIComponent(file.type)
+        var url = '/upload-image?fileType=' + encodeURIComponent(file.type)
         var xhr = new XMLHttpRequest()
         xhr.open("POST", url, true)
         xhr.setRequestHeader('Accept', 'application/json')
@@ -80,12 +82,8 @@ window.onload = function() {
         politician.name = name.value
         politician.jobTitle = jobTitle.value
 
-        var endpoint = '/v1/politicians'
-        if (politician.iden) {
-            endpoint += '/' + politician.iden
-        }
-
-        post(host() + endpoint, politician, function(res) {
+        var endpoint = politician.iden ? '/update-politician' : '/create-politician'
+        post(endpoint, politician, function(res) {
             submit.disabled = false
 
             if (res) {

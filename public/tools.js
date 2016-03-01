@@ -6,14 +6,6 @@ var space = function() {
     return span
 }
 
-var host = function() {
-    if (location.host == 'admin.tally.us') {
-        return 'https://api.tally.us'
-    } else {
-        return 'http://localhost:5000'
-    }
-}
-
 document.addEventListener('DOMContentLoaded', function(event) {
     var title = document.createElement('a')
     title.href = '/'

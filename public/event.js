@@ -15,32 +15,34 @@ window.onload = function() {
 
     if (location.query['iden']) {
         document.title = 'Update Event ' + location.query['iden'] + ' - Tally'
+        content.style.display = 'block'
         submit.textContent = 'Update'
         submit.disabled = true
 
-        get(host() + '/v1/events/' + location.query['iden'], function(res) {
+        post('/get-event', { 'iden': location.query['iden'] }, function(res) {
             if (res) {
                 console.log(res)
                 event = res
-                politicians.value = event.politician && event.politician.iden
+                politicians.value = event.politician
                 headline.value = event.headline || ''
                 summary.value = event.summary || ''
                 image.src = event.imageUrl && event.imageUrl + imgixConfig || ''
                 submit.disabled = false
+                content.style.display = 'block'
             } else {
                 content.innerHTML = 'Unable to load event'
             }
         })
     }
 
-    get(host() + '/v1/politicians', function(res) {
+    post('/list-politicians', null, function(res) {
         if (res) {
             res.politicians.forEach(function(politician) {
                 var option = document.createElement('option')
                 option.text = politician.name
                 option.value = politician.iden
                 politicians.options.add(option)
-                politicians.value = event.politician && event.politician.iden
+                politicians.value = event.politician
             })
         } else {
             content.innerHTML = 'Unable to load politicians'
@@ -64,7 +66,7 @@ window.onload = function() {
         progress.style.display = 'block'
         image.src = ''
 
-        var url = host() + '/internal/upload-image?fileType=' + encodeURIComponent(file.type)
+        var url = '/upload-image?fileType=' + encodeURIComponent(file.type)
         var xhr = new XMLHttpRequest()
         xhr.open("POST", url, true)
         xhr.setRequestHeader('Accept', 'application/json')
@@ -94,12 +96,8 @@ window.onload = function() {
         event.headline = headline.value || ''
         event.summary = summary.value
 
-        var endpoint = '/v1/events'
-        if (event.iden) {
-            endpoint += '/' + event.iden
-        }
-
-        post(host() + endpoint, event, function(res) {
+        var endpoint = event.iden ? '/update-event' : '/create-event'
+        post(endpoint, event, function(res) {
             submit.disabled = false
 
             if (res) {

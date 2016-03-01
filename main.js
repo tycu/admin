@@ -1,11 +1,13 @@
 var workers = process.env.WEB_CONCURRENCY || 1
 var port = process.env.PORT || 5001
 
+var adminKey = 'btxc21dRkHj9aauM9a4lXOxiuNoENtve'
+
 var start = function() {
     var express = require('express')
     var app = express()
 
-    // Require HTTPS in production
+    // Redirect to HTTPS in production
     if (process.env.NODE_ENV == 'production') {
         app.use(function(req, res, next) {
             if (req.headers['x-forwarded-proto'] !== 'https') {
@@ -15,8 +17,28 @@ var start = function() {
             }
         })
     }
-    
+
+    app.use(require('body-parser').json())
+
     app.use(express.static('public'))
+
+    // Require an admin key for all requests
+    app.use(function(req, res, next) {
+        if (req.headers.authorization) {
+            var parts = req.headers.authorization.split(' ')
+            if (parts.length == 2 && parts[0] == 'Bearer') {
+                var token = parts[1]
+                if (token == adminKey) {
+                    next()
+                    return
+                }
+            }
+        }
+
+        res.sendStatus(401)
+    })
+
+    require('./endpoints')(app)
 
     app.listen(port, function() {
         console.log('tally-admin listening on port ' + port)

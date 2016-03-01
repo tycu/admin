@@ -61,8 +61,11 @@ var post = function(url, body, callback) {
             onResponse(xhr.status, xhr.responseText, callback)
         }
     }
-
-    xhr.send(JSON.stringify(body))
+    if (body) {
+        xhr.send(JSON.stringify(body))
+    } else {
+        xhr.send()
+    }
 }
 
 location.query = {}

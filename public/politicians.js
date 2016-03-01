@@ -3,7 +3,7 @@
 window.onload = function() {
     var content = document.getElementById('content')
     
-    get(host() + '/v1/politicians' + location.search, function(res) {
+    post('/list-politicians', null, function(res) {
         if (res) {
             res.politicians.forEach(function(politician) {
                 var p = document.createElement('p')
