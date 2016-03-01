@@ -13,6 +13,9 @@ var gcloud = require('gcloud')({
     'keyFilename': 'tally-admin-service-account.json'
 })
 
+var entities = require('./entities')(redis)
+var generator = require('./generator')(entities, gcloud)
+
 var baseImageUrl = 'https://tally.imgix.net'
 
 module.exports = function(app) {
@@ -47,26 +50,19 @@ module.exports = function(app) {
     })
 
     app.post('/list-politicians', function(req, res) {
-        redis.hgetall(redisKeys.politicians, function(err, reply) {
+        entities.listPoliticians(function(err, politicians) {
             if (err) {
                 res.sendStatus(500)
             } else {
-                var politicians = []
-                if (reply) {
-                    Object.keys(reply).forEach(function(iden) {
-                        politicians.push(JSON.parse(reply[iden]))
-                    })
-                }
-
                 res.json({
-                    'politicians': sortByName(politicians)
+                    'politicians': politicians
                 })
             }
-        })
+        })        
     })
 
     app.post('/get-politician', function(req, res) {
-        getPolitician(req.body.iden, function(err, politician) {
+        entities.getPolitician(req.body.iden, function(err, politician) {
             if (err) {
                 res.sendStatus(500)
             } else if (politician) {
@@ -109,7 +105,7 @@ module.exports = function(app) {
     })
 
     app.post('/update-politician', function(req, res) {
-        getPolitician(req.body.iden, function(err, politician) {
+        entities.getPolitician(req.body.iden, function(err, politician) {
             if (err) {
                 res.sendStatus(500)
             } else if (politician) {
@@ -130,6 +126,7 @@ module.exports = function(app) {
                         res.sendStatus(500)
                     } else {
                         res.json(req.body)
+                        generator.start()
                     }
                 })
             } else {
@@ -139,36 +136,19 @@ module.exports = function(app) {
     })
 
     app.post('/list-events', function(req, res) {
-        redis.lrange(redisKeys.reverseChronologicalEvents, 0, -1, function(err, reply) {
+        entities.listEvents(function(err, events) {
             if (err) {
                 res.sendStatus(500)
             } else {
-                var tasks = []
-                if (reply) {
-                    reply.forEach(function(iden) {
-                        tasks.push(function(callback) {
-                            getEvent(iden, function(err, event) {
-                                callback(err, event)
-                            })
-                        })
-                    })
-                }
-
-                async.parallel(tasks, function(err, results) {
-                    if (err) {
-                        res.sendStatus(500)
-                    } else {
-                        res.json({
-                            'events': results
-                        })
-                    }
+                res.json({
+                    'events': events
                 })
             }
         })
     })
 
     app.post('/get-event', function(req, res) {
-        getEvent(req.body.iden, function(err, event) {
+        entities.getEvent(req.body.iden, function(err, event) {
             if (err) {
                 res.sendStatus(500)
             } else if (event) {
@@ -218,12 +198,13 @@ module.exports = function(app) {
                 res.sendStatus(500)
             } else {
                 res.json(event)
+                generator.start()
             }
         })
     })
 
     app.post('/update-event', function(req, res) {
-        getEvent(req.body.iden, function(err, event) {
+        entities.getEvent(req.body.iden, function(err, event) {
             if (err) {
                 res.sendStatus(500)
             } else if (event) {
@@ -244,6 +225,7 @@ module.exports = function(app) {
                         res.sendStatus(500)
                     } else {
                         res.json(req.body)
+                        generator.start()
                     }
                 })
             } else {
@@ -255,18 +237,6 @@ module.exports = function(app) {
 
 var generateIden = function() {
     return Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
-}
-
-var sortByName = function(items) {
-    return items.sort(function(a, b) {
-        if (a.name > b.name) {
-            return 1
-        } else if (a.name < b.name) {
-            return -1
-        } else {
-            return 0
-        }
-    })
 }
 
 var isValidIdentity = function(entity) {
@@ -288,28 +258,4 @@ var isValidEvent = function(event) {
         return false
     }
     return true
-}
-
-var getPolitician = function(iden, callback) {
-    redis.hget(redisKeys.politicians, iden, function(err, reply) {
-        if (err) {
-            callback(err)
-        } else if (reply) {
-            callback(null, JSON.parse(reply))
-        } else {
-            callback()
-        }
-    })
-}
-
-var getEvent = function(iden, callback) {
-    redis.hget(redisKeys.events, iden, function(err, reply) {
-        if (err) {
-            callback(err)
-        } else if (reply) {
-            callback(null, JSON.parse(reply))
-        } else {
-            callback()
-        }
-    })
 }

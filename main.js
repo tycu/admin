@@ -20,6 +20,19 @@ var start = function() {
 
     app.use(require('body-parser').json())
 
+    // Remove all falsey keys from any POST bodies (empty strings, nulls, etc)
+    app.use(function(req, res, next) {
+        if (req.body) {
+            // Remove empty strings and null keys
+            Object.keys(req.body).forEach(function(key) {
+                if (!req.body[key]) {
+                    delete req.body[key]
+                }
+            })
+        }
+        next()
+    })
+
     app.use(express.static('public'))
 
     // Require an admin key for all requests
