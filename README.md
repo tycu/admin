@@ -1,3 +1,0 @@
-Deploy:
-
-`python deploy.py`
