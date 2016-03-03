@@ -101,6 +101,43 @@ module.exports = function(redis) {
         })
     }
 
+    entities.listUserDonations = function(iden, callback) {
+        redis.lrange(redisKeys.userReverseChronologicalDonations(iden), 0, -1, function(err, reply) {
+            if (err) {
+                callback(err)
+            } else {
+                var tasks = []
+                reply.forEach(function(iden) {
+                    tasks.push(function(callback) {
+                        entities.getDonation(iden, function(err, donation) {
+                            callback(err, donation)
+                        })
+                    })
+                })
+
+                async.parallel(tasks, function(err, results) {
+                    if (err) {
+                        callback(err)
+                    } else {
+                        callback(null, results)
+                    }
+                })
+            }
+        })
+
+        entities.getDonation = function(iden, callback) {
+            redis.hget(redisKeys.donations, iden, function(err, reply) {
+                if (err) {
+                    callback(err)
+                } else if (reply) {
+                    callback(null, JSON.parse(reply))
+                } else {
+                    callback()
+                }
+            })
+        }
+    }
+
     return entities
 }
 

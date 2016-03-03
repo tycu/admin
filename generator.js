@@ -64,15 +64,24 @@ module.exports = function(entities, gcloud) {
 
             events.forEach(function(event) {
                 if (event.politician) {
-                    event.politician = politicians[event.politician]
+                    var politician = politicians[event.politician]
+                    event.politician = {
+                        'iden': politician.iden,
+                        'name': politician.name,
+                        'jobTitle': politician.jobTitle,
+                        'thumbnailUrl': politician.thumbnailUrl
+                    }
                 }
-                
+
                 if (event.supportPacs) {
                     var supportPacs = []
                     event.supportPacs.forEach(function(pacIden) {
                         var pac = pacs[pacIden]
                         if (pac) {
-                            supportPacs.push(pac)
+                            supportPacs.push({
+                                'iden': pac.iden,
+                                'name': pac.name
+                            })
                         }
                     })
                     event.supportPacs = supportPacs
@@ -83,7 +92,10 @@ module.exports = function(entities, gcloud) {
                     event.opposePacs.forEach(function(pacIden) {
                         var pac = pacs[pacIden]
                         if (pac) {
-                            opposePacs.push(pac)
+                            opposePacs.push({
+                                'iden': pac.iden,
+                                'name': pac.name
+                            })
                         }
                     })
                     event.opposePacs = opposePacs
