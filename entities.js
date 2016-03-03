@@ -53,17 +53,15 @@ module.exports = function(redis) {
                 callback(err)
             } else {
                 var tasks = []
-                if (reply) {
-                    reply.forEach(function(iden) {
-                        tasks.push(function(callback) {
-                            entities.getEvent(iden, function(err, event) {
-                                callback(err, event)
-                            })
+                reply.forEach(function(iden) {
+                    tasks.push(function(callback) {
+                        entities.getEvent(iden, function(err, event) {
+                            callback(err, event)
                         })
                     })
-                }
+                })
 
-                async.parallel(tasks, function(err, results) {
+                async.series(tasks, function(err, results) {
                     if (err) {
                         callback(err)
                     } else {
