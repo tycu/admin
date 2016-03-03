@@ -74,6 +74,35 @@ module.exports = function(redis) {
         })
     }
 
+    entities.listPacs = function(callback) {
+        redis.hgetall(redisKeys.pacs, function(err, reply) {
+            if (err) {
+                callabck(err)
+            } else {
+                var pacs = []
+                if (reply) {
+                    Object.keys(reply).forEach(function(iden) {
+                        pacs.push(JSON.parse(reply[iden]))
+                    })
+                }
+
+                callback(null, sortByName(pacs))
+            }
+        })
+    }
+
+    entities.getPac = function(iden, callback) {
+        redis.hget(redisKeys.pacs, iden, function(err, reply) {
+            if (err) {
+                callback(err)
+            } else if (reply) {
+                callback(null, JSON.parse(reply))
+            } else {
+                callback()
+            }
+        })
+    }
+
     return entities
 }
 

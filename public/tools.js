@@ -1,5 +1,7 @@
 'use strict'
 
+NodeList.prototype.forEach = Array.prototype.forEach
+
 var space = function() {
     var span = document.createElement('span')
     span.textContent = ' '

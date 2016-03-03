@@ -60,7 +60,7 @@ module.exports = function(app) {
                     'politicians': politicians
                 })
             }
-        })        
+        })
     })
 
     app.post('/get-politician', function(req, res) {
@@ -235,18 +235,104 @@ module.exports = function(app) {
             }
         })
     })
+
+    app.post('/list-pacs', function(req, res) {
+        entities.listPacs(function(err, pacs) {
+            if (err) {
+                res.sendStatus(500)
+            } else {
+                res.json({
+                    'pacs': pacs
+                })
+            }
+        })
+    })
+
+    app.post('/get-pac', function(req, res) {
+        entities.getPac(req.body.iden, function(err, pac) {
+            if (err) {
+                res.sendStatus(500)
+            } else if (pac) {
+                res.json(pac)
+            } else {
+                res.sendStatus(404)
+            }
+        })
+    })
+
+    app.post('/create-pac', function(req, res) {
+        if (req.body.iden) {
+            res.send(400).json({
+                'error': {
+                    'message': 'Unexpected iden property found on entity.'
+                }
+            })
+            return
+        }
+
+        var pac = req.body
+
+        var now = Date.now() / 1000
+        pac.created = now
+        pac.modified = now
+        pac.iden = generateIden()
+
+        if (!isValidPac(pac)) {
+            res.sendStatus(400)
+            return
+        }
+
+        redis.hset(redisKeys.pacs, pac.iden, JSON.stringify(pac), function(err, reply) {
+            if (err) {
+                res.sendStatus(500)
+            } else {
+                res.json(pac)
+            }
+        })
+    })
+
+    app.post('/update-pac', function(req, res) {
+        entities.getPac(req.body.iden, function(err, pac) {
+            if (err) {
+                res.sendStatus(500)
+            } else if (pac) {
+                if (pac.iden != req.body.iden) {
+                    res.sendStatus(400)
+                    return
+                }
+                if (!isValidPac(req.body)) {
+                    res.sendStatus(400)
+                    return
+                }
+
+                var now = Date.now() / 1000
+                req.body.modified = now
+
+                redis.hset(redisKeys.pacs, req.body.iden, JSON.stringify(req.body), function(err, reply) {
+                    if (err) {
+                        res.sendStatus(500)
+                    } else {
+                        res.json(req.body)
+                        generator.start()
+                    }
+                })
+            } else {
+                res.sendStatus(404)
+            }
+        })
+    })
 }
 
 var generateIden = function() {
     return Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
 }
 
-var isValidIdentity = function(entity) {
+var isValidEntity = function(entity) {
     return entity.iden && entity.created && entity.modified
 }
 
 var isValidPolitician = function(politician) {
-    if (!isValidIdentity(politician)) {
+    if (!isValidEntity(politician)) {
         return false
     }
     if (politician.thumbnailUrl && politician.thumbnailUrl.indexOf(baseImageUrl) != 0) {
@@ -256,7 +342,14 @@ var isValidPolitician = function(politician) {
 }
 
 var isValidEvent = function(event) {
-    if (!isValidIdentity(event)) {
+    if (!isValidEntity(event)) {
+        return false
+    }
+    return true
+}
+
+var isValidPac = function(pac) {
+    if (!isValidEntity(pac)) {
         return false
     }
     return true

@@ -38,6 +38,11 @@ module.exports = function(entities, gcloud) {
                 callback(err, events)
             })
         })
+        tasks.push(function(callback) {
+            entities.listPacs(function(err, pacs) {
+                callback(err, pacs)
+            })
+        })
 
         async.parallel(tasks, function(err, results) {
             if (err) {
@@ -52,9 +57,36 @@ module.exports = function(entities, gcloud) {
 
             var events = results[1]
 
+            var pacs = {}
+            results[2].forEach(function(pac) {
+                pacs[pac.iden] = pac
+            })
+
             events.forEach(function(event) {
                 if (event.politician) {
                     event.politician = politicians[event.politician]
+                }
+                
+                if (event.supportPacs) {
+                    var supportPacs = []
+                    event.supportPacs.forEach(function(pacIden) {
+                        var pac = pacs[pacIden]
+                        if (pac) {
+                            supportPacs.push(pac)
+                        }
+                    })
+                    event.supportPacs = supportPacs
+                }
+
+                if (event.opposePacs) {
+                    var opposePacs = []
+                    event.opposePacs.forEach(function(pacIden) {
+                        var pac = pacs[pacIden]
+                        if (pac) {
+                            opposePacs.push(pac)
+                        }
+                    })
+                    event.opposePacs = opposePacs
                 }
             })
 

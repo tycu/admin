@@ -20,7 +20,23 @@
         </p>
         <textarea id="headline" placeholder="Hed"></textarea>
         <textarea id="summary" placeholder="Dek"></textarea>
-        <button id="submit">Add</button>
+        <div>
+            <p>
+                Support:
+                <button id="addSupport">Add</button>
+            </p>
+            <div id="supportOptions" style="margin-left:30px;"></div>
+        </div>
+        <div>
+            <p>
+                Oppose:
+                <button id="addOppose">Add</button>
+            </p>
+            <div id="opposeOptions" style="margin-left:30px;"></div>
+        </div>
+        <p>
+            <button id="submit">Create</button>
+        </p>
         <div id="error"></div>
         <input type="file" id="fileInput" accept="image/jpeg, image/png" style="display:none;">
     </div>
