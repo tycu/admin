@@ -16,5 +16,8 @@ module.exports = {
     },
     'userReverseChronologicalDonations': function(userIden) {
         return 'user_' + userIden + '_reverse_chronological_donations'
+    },
+    'eventDonationTotals': function(eventIden) {
+        return 'event_' + eventIden + '_donation_totals'
     }
 }

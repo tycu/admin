@@ -40,7 +40,16 @@ module.exports = function(redis) {
             if (err) {
                 callback(err)
             } else if (reply) {
-                callback(null, JSON.parse(reply))
+                var event = JSON.parse(reply)
+                redis.hgetall(redisKeys.eventDonationTotals(event.iden), function(err, reply) {
+                    if (err) {
+                        callback(err)
+                    } else {
+                        event.supportTotal = reply && reply.support && parseInt(reply.support) || 0
+                        event.opposeTotal = reply && reply.oppose && parseInt(reply.oppose) || 0
+                        callback(null, event)
+                    }
+                })
             } else {
                 callback()
             }
