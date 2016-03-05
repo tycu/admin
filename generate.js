@@ -3,7 +3,7 @@
 var generator = require('./generator')()
 generator.generateAppData()
 generator.generateWebsite(function(err) {
-    if err {
+    if (err) {
         console.error('generating website failed')
         console.error(err)
     } else {
