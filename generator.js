@@ -3,32 +3,46 @@
 var async = require("async")
 var redisKeys = require('./redis-keys')
 
-module.exports = function(redis, entities, gcloud) {
+var redis
+if (process.env.REDISCLOUD_URL) {
+    redis = require("redis").createClient(process.env.REDISCLOUD_URL, { 'no_ready_check': true })
+} else {
+    redis = require("redis").createClient()
+}
+
+var gcloud = require('gcloud')({
+    'projectId': 'tally-us',
+    'keyFilename': 'tally-admin-service-account.json'
+})
+
+module.exports = function() {
+    var entities = require('./entities')(redis)
+
     var generator = {}
-    generator.start = function() {
-        if (!generator.started) {
-            generator.started = true
-            generator.pending = false
-            generate(function(err) {
+    generator.generateAppData = function() {
+        if (!generator.generatingAppData) {
+            generator.generatingAppData = true
+            generator.pendingGenerateAppData = false
+            _generateAppData(function(err) {
                 if (err) {
-                    console.error('updating static app data failed')
+                    console.error('generating static app data failed')
                     console.error(err)
                 } else {
-                    console.log('static app data updated')
+                    console.log('static app data generated')
                 }
 
-                generator.started = false
+                generator.generatingAppData = false
 
-                if (generator.pending) {
-                    generator.start()
+                if (generator.pendingGenerateAppData) {
+                    generator.generateAppData()
                 }
             })
         } else {
-            generator.pending = true
+            generator.pendingGenerateAppData = true
         }
     }
 
-    var generate = function(callback) {
+    var _generateAppData = function(callback) {
         var tasks = []
         tasks.push(function(callback) {
             entities.listPoliticians(function(err, politicians) {
@@ -188,6 +202,12 @@ module.exports = function(redis, entities, gcloud) {
                 }
             })
         })
+    }
+
+    generator.generateWebsite = function(callback) {
+        setTimeout(function() {
+            callback()
+        }, 10000)
     }
 
     return generator
