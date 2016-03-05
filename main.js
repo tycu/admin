@@ -9,6 +9,13 @@ var start = function() {
     var express = require('express')
     var app = express()
 
+    var redis
+    if (process.env.REDISCLOUD_URL) {
+        redis = require("redis").createClient(process.env.REDISCLOUD_URL, { 'no_ready_check': true })
+    } else {
+        redis = require("redis").createClient()
+    }
+
     // Redirect to HTTPS in production
     if (process.env.NODE_ENV == 'production') {
         app.use(function(req, res, next) {
@@ -53,7 +60,7 @@ var start = function() {
         res.sendStatus(401)
     })
 
-    require('./endpoints')(app)
+    require('./endpoints')(app, redis)
 
     app.listen(port, function() {
         console.log('tally-admin listening on port ' + port)

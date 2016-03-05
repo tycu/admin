@@ -3,6 +3,8 @@
 window.onload = function() {
     var content = document.getElementById('content')
     var name = document.getElementById('name')
+    var description = document.getElementById('description')
+    var color = document.getElementById('color')
     var submit = document.getElementById('submit')
     var error = document.getElementById('error')
 
@@ -19,6 +21,8 @@ window.onload = function() {
                 pac = res
                 document.title = 'Update ' + pac.name + ' - Tally'
                 name.value = pac.name || ''
+                description.value = pac.description || ''
+                color.value = pac.color
                 submit.disabled = false
                 content.style.display = 'block'
             } else {
@@ -32,6 +36,8 @@ window.onload = function() {
         error.textContent = ''
 
         pac.name = name.value
+        pac.description = description.value
+        pac.color = color.value
 
         var endpoint = pac.iden ? '/update-pac' : '/create-pac'
         post(endpoint, pac, function(res) {

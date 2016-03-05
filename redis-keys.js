@@ -11,6 +11,7 @@ module.exports = {
     'facebookUserIdToUserIden': 'facebook_user_id_to_user_iden',
     'userIdenToStripeCustomerId': 'user_iden_to_stripe_customer_id',
     'donations': 'donations',
+    'donationsSum': 'donations_sum',
     'eventIdenToUserDonationIden': function(userIden) {
         return 'user_' + userIden + '_event_iden_to_donation_iden'
     },
@@ -19,5 +20,11 @@ module.exports = {
     },
     'eventDonationTotals': function(eventIden) {
         return 'event_' + eventIden + '_donation_totals'
+    },
+    'politicianDonationTotals': function(politicianIden) {
+        return 'politician_' + politicianIden + '_donation_totals'
+    },
+    'userDonationsSum': function(userIden) {
+        return 'user_' + userIden + '_donation_sum'
     }
 }

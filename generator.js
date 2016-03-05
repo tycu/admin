@@ -1,16 +1,18 @@
 'use strict'
 
 var async = require("async")
+var redisKeys = require('./redis-keys')
 
-module.exports = function(entities, gcloud) {
+module.exports = function(redis, entities, gcloud) {
     var generator = {}
     generator.start = function() {
         if (!generator.started) {
             generator.started = true
             generator.pending = false
-            generate(function(success) {
-                if (!success) {
+            generate(function(err) {
+                if (err) {
                     console.error('updating static app data failed')
+                    console.error(err)
                 } else {
                     console.log('static app data updated')
                 }
@@ -30,7 +32,28 @@ module.exports = function(entities, gcloud) {
         var tasks = []
         tasks.push(function(callback) {
             entities.listPoliticians(function(err, politicians) {
-                callback(err, politicians)
+                if (err) {
+                    callback(err)
+                } else {
+                    var tasks = []
+                    politicians.forEach(function(politician) {
+                        tasks.push(function(callback) {
+                            redis.hgetall(redisKeys.politicianDonationTotals(politician.iden), function(err, reply) {
+                                if (err) {
+                                    callback(err)
+                                } else {
+                                    politician.supportTotal = reply && reply.support && parseInt(reply.support) || 0
+                                    politician.opposeTotal = reply && reply.oppose && parseInt(reply.oppose) || 0
+                                    callback()
+                                }
+                            })
+                        })
+                    })
+
+                    async.parallel(tasks, function(err, results) {
+                        callback(err, politicians)
+                    })
+                }
             })
         })
         tasks.push(function(callback) {
@@ -50,12 +73,13 @@ module.exports = function(entities, gcloud) {
                 return
             }
 
-            var politicians = {}
-            results[0].forEach(function(politician) {
-                politicians[politician.iden] = politician
-            })
-
+            var politicians = results[0]
             var events = results[1]
+
+            var politicianMap = {}
+            politicians.forEach(function(politician) {
+                politicianMap[politician.iden] = politician
+            })
 
             var pacs = {}
             results[2].forEach(function(pac) {
@@ -64,7 +88,7 @@ module.exports = function(entities, gcloud) {
 
             events.forEach(function(event) {
                 if (event.politician) {
-                    var politician = politicians[event.politician]
+                    var politician = politicianMap[event.politician]
                     event.politician = {
                         'iden': politician.iden,
                         'name': politician.name,
@@ -80,7 +104,9 @@ module.exports = function(entities, gcloud) {
                         if (pac) {
                             supportPacs.push({
                                 'iden': pac.iden,
-                                'name': pac.name
+                                'name': pac.name,
+                                'description': pac.description,
+                                'color': pac.color
                             })
                         }
                     })
@@ -94,7 +120,9 @@ module.exports = function(entities, gcloud) {
                         if (pac) {
                             opposePacs.push({
                                 'iden': pac.iden,
-                                'name': pac.name
+                                'name': pac.name,
+                                'description': pac.description,
+                                'color': pac.color
                             })
                         }
                     })
@@ -103,28 +131,83 @@ module.exports = function(entities, gcloud) {
             })
 
             var bucket = gcloud.storage().bucket('generated.tally.us');
-            var file = bucket.file('v1/events/recent.json');
 
-            var stream = new require('stream').Readable()
-            stream._read = function(){};
-            stream.push(JSON.stringify({
-                'events': events
-            }))
-            stream.push(null)
+            var tasks = []
+            tasks.push(function(callback) {
+                writeFile(bucket.file('v1/events/recent.json'), {
+                    'events': events
+                }, function(err) {
+                    callback(err)
+                })
+            })
+            tasks.push(function(callback) {
+                var sorted = events.slice().sort(function(a, b) {
+                    var donationsDiff = (b.supportTotal + b.opposeTotal) - (a.supportTotal + a.opposeTotal)
+                    if (donationsDiff == 0) {
+                        return b.created - a.created
+                    } else {
+                        return donationsDiff
+                    }
+                })
 
-            stream.pipe(file.createWriteStream({
-                'gzip': true,
-                'metadata': {
-                    'contentType': 'application/json',
-                    'cacheControl': 'no-cache'
+                writeFile(bucket.file('v1/events/top.json'), {
+                    'events': sorted
+                }, function(err) {
+                    callback(err)
+                })
+            })
+            tasks.push(function(callback) {
+                var sorted = politicians.slice().sort(function(a, b) {
+                    return (b.supportTotal + b.opposeTotal) - (a.supportTotal + a.opposeTotal)
+                })
+
+                var publicData = []
+                sorted.forEach(function(politician) {
+                    publicData.push({
+                        'iden': politician.iden,
+                        'name': politician.name,
+                        'jobTitle': politician.jobTitle,
+                        'thumbnailUrl': politician.thumbnailUrl,
+                        'supportTotal': politician.supportTotal,
+                        'opposeTotal': politician.opposeTotal
+                    })
+                })
+
+                writeFile(bucket.file('v1/scoreboards/all-time.json'), {
+                    'politicians': publicData
+                }, function(err) {
+                    callback(err)
+                })
+            })
+
+            async.parallel(tasks, function(err, results) {
+                if (err) {
+                    callback(err)
+                } else {
+                    callback()
                 }
-            })).on('error', function(e) {
-                callback(false)
-            }).on('finish', function() {
-                callback(true)
             })
         })
     }
 
     return generator
+}
+
+var writeFile = function(file, json, callback) {
+    var stream = new require('stream').Readable()
+    stream._read = function(){};
+    stream.push(JSON.stringify(json))
+    stream.push(null)
+
+    stream.pipe(file.createWriteStream({
+        'gzip': true,
+        'metadata': {
+            'contentType': 'application/json',
+            'cacheControl': 'no-cache'
+        }
+    })).on('error', function(err) {
+        callback(err)
+    }).on('finish', function() {
+        callback()
+    })
 }

@@ -3,24 +3,17 @@
 var async = require("async")
 var redisKeys = require('./redis-keys')
 
-var redis
-if (process.env.REDISCLOUD_URL) {
-    redis = require("redis").createClient(process.env.REDISCLOUD_URL, { 'no_ready_check': true })
-} else {
-    redis = require("redis").createClient()
-}
-
 var gcloud = require('gcloud')({
     'projectId': 'tally-us',
     'keyFilename': 'tally-admin-service-account.json'
 })
 
-var entities = require('./entities')(redis)
-var generator = require('./generator')(entities, gcloud)
-
 var baseImageUrl = 'https://tally.imgix.net'
 
-module.exports = function(app) {
+module.exports = function(app, redis) {
+    var entities = require('./entities')(redis)
+    var generator = require('./generator')(redis, entities, gcloud)
+
     app.post('/upload-image', function(req, res) {
         var fileTypeExtensions = {
             'image/jpeg': '.jpg',
