@@ -81,6 +81,8 @@ module.exports = function() {
             })
         })
 
+        var maxAmount = 0
+
         async.parallel(tasks, function(err, results) {
             if (err) {
                 callback(false)
@@ -107,7 +109,8 @@ module.exports = function() {
                         'iden': politician.iden,
                         'name': politician.name,
                         'jobTitle': politician.jobTitle,
-                        'thumbnailUrl': politician.thumbnailUrl
+                        'thumbnailUrl': politician.thumbnailUrl,
+                        'barWeight': politician.barWeight
                     }
                 }
 
@@ -142,6 +145,30 @@ module.exports = function() {
                     })
                     event.opposePacs = opposePacs
                 }
+
+                var amount = Math.floor(Math.random() * 1500)
+                var support = Math.random()
+                var oppose = 1 - support
+
+                event.supportTotal = Math.floor(amount * support)
+                event.opposeTotal = Math.floor(amount * oppose)
+
+                politician.supportTotal += event.supportTotal
+                politician.opposeTotal += event.opposeTotal
+
+                maxAmount = Math.max(maxAmount, amount)
+            })
+
+            events.forEach(function(event) {
+                event.barWeight = (event.supportTotal + event.opposeTotal) / maxAmount
+            })
+
+            maxAmount = 0
+            politicians.forEach(function(politician) {
+                maxAmount = Math.max(politician.supportTotal + politician.opposeTotal, maxAmount)
+            })
+            politicians.forEach(function(politician) {
+                politician.barWeight = (politician.supportTotal + politician.opposeTotal) / maxAmount
             })
 
             var bucket = gcloud.storage().bucket('generated.tally.us');
@@ -183,7 +210,8 @@ module.exports = function() {
                         'jobTitle': politician.jobTitle,
                         'thumbnailUrl': politician.thumbnailUrl,
                         'supportTotal': politician.supportTotal,
-                        'opposeTotal': politician.opposeTotal
+                        'opposeTotal': politician.opposeTotal,
+                        'barWeight': politician.barWeight
                     })
                 })
 
