@@ -4,6 +4,7 @@ window.onload = function() {
     var content = document.getElementById('content')
     var name = document.getElementById('name')
     var jobTitle = document.getElementById('jobTitle')
+    var twitterUsername = document.getElementById('twitterUsername')
     var thumbnail = document.getElementById('thumbnail')
     var progress = document.getElementById('progress')
     var fileInput = document.getElementById('fileInput')
@@ -27,6 +28,7 @@ window.onload = function() {
                 document.title = 'Update ' + politician.name + ' - Tally'
                 name.value = politician.name || ''
                 jobTitle.value = politician.jobTitle || ''
+                twitterUsername.value = politician.twitterUsername || ''
                 thumbnail.src = politician.thumbnailUrl && politician.thumbnailUrl + imgixConfig || ''
                 submit.disabled = false
                 content.style.display = 'block'
@@ -81,6 +83,7 @@ window.onload = function() {
 
         politician.name = name.value
         politician.jobTitle = jobTitle.value
+        politician.twitterUsername = twitterUsername.value
 
         var endpoint = politician.iden ? '/update-politician' : '/create-politician'
         post(endpoint, politician, function(res) {

@@ -44,6 +44,10 @@ var start = function() {
 
     app.use(express.static('public'))
 
+    if (process.env.NODE_ENV != 'production') {
+        app.use(express.static('generated'))
+    }
+
     // Require an admin key for all requests
     app.use(function(req, res, next) {
         if (req.headers.authorization) {

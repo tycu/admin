@@ -7,6 +7,8 @@
     "cors": "^2.7.1",
     "express": "^4.13.4",
     "gcloud": "^0.28.0",
+    "mkdirp": "^0.5.1",
+    "mustache": "^2.2.1",
     "redis": "^2.4.2",
     "request": "^2.69.0",
     "throng": "^2.0.1"

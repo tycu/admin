@@ -12,7 +12,7 @@ var baseImageUrl = 'https://tally.imgix.net'
 
 module.exports = function(app, redis) {
     var entities = require('./entities')(redis)
-    var generator = require('./generator')()
+    var appData = require('./app-data')
 
     app.post('/upload-image', function(req, res) {
         var fileTypeExtensions = {
@@ -121,7 +121,7 @@ module.exports = function(app, redis) {
                         res.sendStatus(500)
                     } else {
                         res.json(req.body)
-                        generator.generateAppData()
+                        appData.generate()
                     }
                 })
             } else {
@@ -193,7 +193,7 @@ module.exports = function(app, redis) {
                 res.sendStatus(500)
             } else {
                 res.json(event)
-                generator.generateAppData()
+                appData.generate()
             }
         })
     })
@@ -220,7 +220,7 @@ module.exports = function(app, redis) {
                         res.sendStatus(500)
                     } else {
                         res.json(req.body)
-                        generator.generateAppData()
+                        appData.generate()
                     }
                 })
             } else {
@@ -306,7 +306,7 @@ module.exports = function(app, redis) {
                         res.sendStatus(500)
                     } else {
                         res.json(req.body)
-                        generator.generateAppData()
+                        appData.generate()
                     }
                 })
             } else {
