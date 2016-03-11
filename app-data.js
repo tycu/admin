@@ -57,7 +57,7 @@ var _generate = function(callback) {
                 var tasks = []
                 politicians.forEach(function(politician) {
                     tasks.push(function(callback) {
-                        redis.hgetall(redisKeys.politicianDonationTotals(politician.iden), function(err, reply) {
+                        redis.hgetall(redisKeys.politicianContributionTotals(politician.iden), function(err, reply) {
                             if (err) {
                                 callback(err)
                             } else {
@@ -189,11 +189,11 @@ var _generate = function(callback) {
         })
         tasks.push(function(callback) {
             var sorted = events.slice().sort(function(a, b) {
-                var donationsDiff = (b.supportTotal + b.opposeTotal) - (a.supportTotal + a.opposeTotal)
-                if (donationsDiff == 0) {
+                var contributionsDiff = (b.supportTotal + b.opposeTotal) - (a.supportTotal + a.opposeTotal)
+                if (contributionsDiff == 0) {
                     return b.created - a.created
                 } else {
-                    return donationsDiff
+                    return contributionsDiff
                 }
             })
 

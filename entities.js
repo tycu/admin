@@ -41,7 +41,7 @@ module.exports = function(redis) {
                 callback(err)
             } else if (reply) {
                 var event = JSON.parse(reply)
-                redis.hgetall(redisKeys.eventDonationTotals(event.iden), function(err, reply) {
+                redis.hgetall(redisKeys.eventContributionTotals(event.iden), function(err, reply) {
                     if (err) {
                         callback(err)
                     } else {
@@ -110,16 +110,16 @@ module.exports = function(redis) {
         })
     }
 
-    entities.listUserDonations = function(iden, callback) {
-        redis.lrange(redisKeys.userReverseChronologicalDonations(iden), 0, -1, function(err, reply) {
+    entities.listUserContributions = function(iden, callback) {
+        redis.lrange(redisKeys.userReverseChronologicalContributions(iden), 0, -1, function(err, reply) {
             if (err) {
                 callback(err)
             } else {
                 var tasks = []
                 reply.forEach(function(iden) {
                     tasks.push(function(callback) {
-                        entities.getDonation(iden, function(err, donation) {
-                            callback(err, donation)
+                        entities.getContribution(iden, function(err, contribution) {
+                            callback(err, contribution)
                         })
                     })
                 })
@@ -134,8 +134,8 @@ module.exports = function(redis) {
             }
         })
 
-        entities.getDonation = function(iden, callback) {
-            redis.hget(redisKeys.donations, iden, function(err, reply) {
+        entities.getContribution = function(iden, callback) {
+            redis.hget(redisKeys.contributions, iden, function(err, reply) {
                 if (err) {
                     callback(err)
                 } else if (reply) {
