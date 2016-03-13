@@ -28,9 +28,12 @@ img {
     display: inline-block;
     border: 0;
 }
+a {
+    color: #009DD1;
+}
 #header {
     padding: 14px;
-    background-color: #663399;
+    background-color: #009DD1;
     color: white;
 }
 #title {
