@@ -90,7 +90,7 @@ window.onload = function() {
             submit.disabled = false
 
             if (res) {
-                window.location.replace('/politician.html?iden=' + res.iden)
+                location.replace('/politician.html?iden=' + res.iden)
             } else {
                 error.textContent = 'Save failed'
             }

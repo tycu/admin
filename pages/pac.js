@@ -44,7 +44,7 @@ window.onload = function() {
             submit.disabled = false
 
             if (res) {
-                window.location.replace('/pac.html?iden=' + res.iden)
+                location.replace('/pac.html?iden=' + res.iden)
             } else {
                 error.textContent = 'Save failed'
             }

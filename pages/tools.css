@@ -1,43 +1,38 @@
 * {
     box-sizing: border-box;
 }
-
 html, body {
     margin: 0;
 }
-
 body, textarea, input[type="text"] {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     color: #333;
     font-size: 14px;
     line-height: 18px;
 }
-
 textarea, input[type="text"] {
     display: block;
     border: 1px solid #aaa;
     width: 400px;
 }
-
 p, textarea, input[type="text"] {
     margin: 14px 0;
 }
-
 textarea {
     height: 100px;    
 }
-
+select {
+    max-width: 400px;
+}
 img {
     display: inline-block;
     border: 0;
 }
-
 #header {
     padding: 14px;
     background-color: #663399;
     color: white;
 }
-
 #title {
     font-weight: bold;
     font-size: 18px;
@@ -45,11 +40,9 @@ img {
     color: white;
     text-decoration: none;
 }
-
 #content {
     margin: 14px;
 }
-
 .pointer {
     cursor: pointer;
 }

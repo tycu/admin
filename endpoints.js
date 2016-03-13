@@ -44,6 +44,15 @@ module.exports = function(app, redis) {
         })
     })
 
+    app.post('/send-push-notification', function(req, res) {
+        if (!req.body.message) {
+            res.sendStatus(400)
+            return
+        }
+        
+        res.json({})
+    })
+
     app.post('/list-politicians', function(req, res) {
         entities.listPoliticians(function(err, politicians) {
             if (err) {

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Push Notification - Tally</title>
+    <link rel="stylesheet" type="text/css" href="/tools.css">
+    <script src="/http.js"></script>
+    <script src="/tools.js"></script>
+    <script src="/notify.js"></script>
+</head>
+<body>
+    <div id="content">
+        <p style="font-weight:bold;">
+            Send a push notification to all Tally users:
+        </p>
+        <p>
+            Event:
+            <select id="events"></select>
+        </p>
+        <textarea id="message" placeholder="Message"></textarea>
+        <p>
+            <button id="submit">Send</button>
+        </p>
+        <div id="error"></div>
+    </div>
+</body>
+</html>
