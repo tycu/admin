@@ -139,7 +139,15 @@ window.onload = function() {
             option.value = pacs.iden
             pacSelect.options.add(option)
         })
+
+        var remove = document.createElement('button')
+        remove.textContent = 'Remove'
+        remove.onclick = function() {
+            p.parentNode.removeChild(p)
+        }
+
         p.appendChild(pacSelect)
+        p.appendChild(remove)
         return p
     }
 
