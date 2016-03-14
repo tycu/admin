@@ -3,6 +3,7 @@
 window.onload = function() {
     var content = document.getElementById('content')
     var image = document.getElementById('image')
+    var imageAttribution = document.getElementById('imageAttribution')
     var politicians = document.getElementById('politicians')
     var headline = document.getElementById('headline')
     var summary = document.getElementById('summary')
@@ -52,6 +53,7 @@ window.onload = function() {
                                 headline.value = event.headline || ''
                                 summary.value = event.summary || ''
                                 image.src = event.imageUrl && event.imageUrl + imgixConfig || ''
+                                imageAttribution.value = event.imageAttribution || ''
 
                                 if (event.supportPacs) {
                                     event.supportPacs.forEach(function(pacIden) {
@@ -178,9 +180,10 @@ window.onload = function() {
         submit.disabled = true
         error.textContent = ''
 
+        event.imageAttribution = imageAttribution.value
         event.politician = politicians.value
         event.headline = headline.value || ''
-        event.summary = summary.value
+        event.summary = summary.value || ''
         event.supportPacs = support
         event.opposePacs = oppose
 
