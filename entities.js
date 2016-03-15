@@ -35,48 +35,14 @@ module.exports = function(redis) {
         })
     }
 
-    entities.getEvent = function(iden, callback) {
-        redis.hget(redisKeys.events, iden, function(err, reply) {
+    entities.getPac = function(iden, callback) {
+        redis.hget(redisKeys.pacs, iden, function(err, reply) {
             if (err) {
                 callback(err)
             } else if (reply) {
-                var event = JSON.parse(reply)
-                redis.hgetall(redisKeys.eventContributionTotals(event.iden), function(err, reply) {
-                    if (err) {
-                        callback(err)
-                    } else {
-                        event.supportTotal = reply && reply.support && parseInt(reply.support) || 0
-                        event.opposeTotal = reply && reply.oppose && parseInt(reply.oppose) || 0
-                        callback(null, event)
-                    }
-                })
+                callback(null, JSON.parse(reply))
             } else {
                 callback()
-            }
-        })
-    }
-
-    entities.listEvents = function(callback) {
-        redis.lrange(redisKeys.reverseChronologicalEvents, 0, -1, function(err, reply) {
-            if (err) {
-                callback(err)
-            } else {
-                var tasks = []
-                reply.forEach(function(iden) {
-                    tasks.push(function(callback) {
-                        entities.getEvent(iden, function(err, event) {
-                            callback(err, event)
-                        })
-                    })
-                })
-
-                async.series(tasks, function(err, results) {
-                    if (err) {
-                        callback(err)
-                    } else {
-                        callback(null, results)
-                    }
-                })
             }
         })
     }
@@ -98,28 +64,36 @@ module.exports = function(redis) {
         })
     }
 
-    entities.getPac = function(iden, callback) {
-        redis.hget(redisKeys.pacs, iden, function(err, reply) {
+    entities.getEvent = function(iden, callback) {
+        entities.getEvents([iden], function(err, events) {
             if (err) {
                 callback(err)
-            } else if (reply) {
-                callback(null, JSON.parse(reply))
+            } else if (events.length > 0) {
+                callback(null, events[0])
             } else {
                 callback()
             }
         })
     }
 
-    entities.listUserContributions = function(iden, callback) {
-        redis.lrange(redisKeys.userReverseChronologicalContributions(iden), 0, -1, function(err, reply) {
+    entities.getEvents = function(idens, callback) {
+        redis.hmget(redisKeys.events, idens, function(err, reply) {
             if (err) {
                 callback(err)
             } else {
                 var tasks = []
-                reply.forEach(function(iden) {
+                reply.forEach(function(json) {
                     tasks.push(function(callback) {
-                        entities.getContribution(iden, function(err, contribution) {
-                            callback(err, contribution)
+                        var event = JSON.parse(json)
+
+                        redis.hgetall(redisKeys.eventContributionTotals(event.iden), function(err, reply) {
+                            if (err) {
+                                callback(err)
+                            } else {
+                                event.supportTotal = reply && reply.support && parseInt(reply.support) || 0
+                                event.opposeTotal = reply && reply.oppose && parseInt(reply.oppose) || 0
+                                callback(null, event)
+                            }
                         })
                     })
                 })
@@ -133,18 +107,94 @@ module.exports = function(redis) {
                 })
             }
         })
+    }
 
-        entities.getContribution = function(iden, callback) {
-            redis.hget(redisKeys.contributions, iden, function(err, reply) {
-                if (err) {
-                    callback(err)
-                } else if (reply) {
-                    callback(null, JSON.parse(reply))
-                } else {
-                    callback()
-                }
-            })
-        }
+    entities.listEvents = function(callback) {
+        redis.lrange(redisKeys.reverseChronologicalEvents, 0, -1, function(err, reply) {
+            if (err) {
+                callback(err)
+            } else {
+                entities.getEvents(reply, function(err, events) {
+                    if (err) {
+                        callback(err)
+                    } else {
+                        callback(null, events)
+                    }
+                })
+            }
+        })
+    }
+
+    entities.getContribution = function(iden, callback) {
+        entities.getContributions([iden], function(err, contributions) {
+            if (err) {
+                callback(err)
+            } else if (contributions.length > 0) {
+                callback(null, contributions[0])
+            } else {
+                callback()
+            }
+        })
+    }
+
+    entities.getContributions = function(idens, callback) {
+        redis.hmget(redisKeys.contributions, idens, function(err, reply) {
+            if (err) {
+                callback(err)
+            } else {
+                var contributions = []
+
+                var tasks = []
+                reply.forEach(function(json) {
+                    var contribution = JSON.parse(json)
+                    contributions.push(contribution)
+
+                    tasks.push(function(callback) {
+                        entities.getEvent(contribution.event, function(err, event) {
+                            if (err) {
+                                callback(err)
+                            } else {
+                                delete event.supportPacs
+                                delete event.opposePacs
+
+                                contribution.event = event
+
+                                entities.getPolitician(event.politician, function(err, politician) {
+                                    event.politician = politician
+                                    callback(err)
+                                })
+                            }
+                        })
+                    })
+                    tasks.push(function(callback) {
+                        entities.getPac(contribution.pac, function(err, pac) {
+                            contribution.pac = pac
+                            callback(err)
+                        })
+                    })
+                })
+                
+                async.parallel(tasks, function(err, results) {
+                    if (err) {
+                        callback(err)
+                    } else {
+                        callback(null, contributions)
+                    }
+                })
+            }
+        })
+    }
+
+    entities.listUserContributions = function(iden, callback) {
+        redis.lrange(redisKeys.userReverseChronologicalContributions(iden), 0, -1, function(err, reply) {
+            if (err) {
+                callback(err)
+            } else {
+                entities.getContributions(reply, function(err, contributions) {
+                    callback(err, contributions)
+                })
+            }
+        })
     }
 
     return entities

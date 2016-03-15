@@ -219,7 +219,12 @@ window.onload = function() {
         event.politician = politicians.value
         event.headline = headline.value || ''
         event.summary = summary.value || ''
-        event.supportPacs = support
-        event.opposePacs = oppose
+
+        if (support.length > 0) {
+            event.supportPacs = support
+        }
+        if (oppose.length > 0) {
+            event.opposePacs = oppose
+        }
     }
 }
