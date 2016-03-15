@@ -6,6 +6,10 @@ var redisKeys = require('./redis-keys')
 module.exports = function(redis) {
     var entities = {}
 
+    entities.generateIden = function() {
+        return Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
+    }
+
     entities.getPolitician = function(iden, callback) {
         entities.getPoliticians([iden], function(err, politicians) {
             if (err) {
@@ -254,9 +258,13 @@ module.exports = function(redis) {
             if (err) {
                 callback(err)
             } else {
-                entities.getContributions(reply, function(err, contributions) {
-                    callback(err, contributions)
-                })
+                if (reply.length > 0) {
+                    entities.getContributions(reply, function(err, contributions) {
+                        callback(err, contributions)
+                    })
+                } else {
+                    callback(null, [])
+                }
             }
         })
     }

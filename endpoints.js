@@ -26,7 +26,7 @@ module.exports = function(app, redis) {
             return
         }
 
-        var fileName = generateIden() + extension
+        var fileName = entities.entities.generateIden() + extension
 
         var bucket = gcloud.storage().bucket('static.tally.us');
         var file = bucket.file('images/' + fileName);
@@ -94,7 +94,7 @@ module.exports = function(app, redis) {
         var now = Date.now() / 1000
         politician.created = now
         politician.modified = now
-        politician.iden = generateIden()
+        politician.iden = entities.generateIden()
 
         if (!isValidPolitician(politician)) {
             res.sendStatus(400)
@@ -185,7 +185,7 @@ module.exports = function(app, redis) {
         var now = Date.now() / 1000
         event.created = now
         event.modified = now
-        event.iden = generateIden()
+        event.iden = entities.generateIden()
 
         if (!isValidEvent(event)) {
             res.sendStatus(400)
@@ -316,7 +316,7 @@ module.exports = function(app, redis) {
         var now = Date.now() / 1000
         pac.created = now
         pac.modified = now
-        pac.iden = generateIden()
+        pac.iden = entities.generateIden()
 
         if (!isValidPac(pac)) {
             res.sendStatus(400)
@@ -365,10 +365,6 @@ module.exports = function(app, redis) {
             }
         })
     })
-}
-
-var generateIden = function() {
-    return Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
 }
 
 var isValidEntity = function(entity) {
