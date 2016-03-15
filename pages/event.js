@@ -2,6 +2,7 @@
 
 window.onload = function() {
     var content = document.getElementById('content')
+    var top = document.getElementById('top')
     var image = document.getElementById('image')
     var imageAttribution = document.getElementById('imageAttribution')
     var politicians = document.getElementById('politicians')
@@ -12,6 +13,7 @@ window.onload = function() {
     var addOppose = document.getElementById('addOppose')
     var opposeOptions = document.getElementById('opposeOptions')
     var submit = document.getElementById('submit')
+    var publish = document.getElementById('publish')
     var error = document.getElementById('error')
 
     var event = {}
@@ -49,6 +51,12 @@ window.onload = function() {
                             if (res) {
                                 console.log(res)
                                 event = res
+
+                                if (event.draft) {
+                                    top.textContent = 'Draft'
+                                    publish.style.display = 'block'
+                                }
+
                                 politicians.value = event.politician
                                 headline.value = event.headline || ''
                                 summary.value = event.summary || ''
@@ -162,6 +170,36 @@ window.onload = function() {
     }
 
     submit.onclick = function() {
+        submit.disabled = true
+        error.textContent = ''
+
+        updateEvent()
+
+        var endpoint
+        if (event.iden) {
+            endpoint = '/update-event'
+        } else {
+            endpoint = '/create-event'
+            event.draft = true
+        }
+
+        post(endpoint, event, function(res) {
+            submit.disabled = false
+
+            if (res) {
+                location.replace('/event.html?iden=' + res.iden)
+            } else {
+                error.textContent = 'Save failed'
+            }
+        })
+    }
+
+    publish.onclick = function() {
+        event.draft = false
+        submit.click()
+    }
+
+    var updateEvent = function() {
         var support = []
         var oppose = []
 
@@ -177,25 +215,11 @@ window.onload = function() {
             }
         })
 
-        submit.disabled = true
-        error.textContent = ''
-
         event.imageAttribution = imageAttribution.value
         event.politician = politicians.value
         event.headline = headline.value || ''
         event.summary = summary.value || ''
         event.supportPacs = support
         event.opposePacs = oppose
-
-        var endpoint = event.iden ? '/update-event' : '/create-event'
-        post(endpoint, event, function(res) {
-            submit.disabled = false
-
-            if (res) {
-                location.replace('/event.html?iden=' + res.iden)
-            } else {
-                error.textContent = 'Save failed'
-            }
-        })
     }
 }

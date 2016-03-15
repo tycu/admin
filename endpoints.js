@@ -49,13 +49,14 @@ module.exports = function(app, redis) {
             res.sendStatus(400)
             return
         }
-        
+
         res.json({})
     })
 
     app.post('/list-politicians', function(req, res) {
         entities.listPoliticians(function(err, politicians) {
             if (err) {
+                console.error(err)
                 res.sendStatus(500)
             } else {
                 res.json({
@@ -68,6 +69,7 @@ module.exports = function(app, redis) {
     app.post('/get-politician', function(req, res) {
         entities.getPolitician(req.body.iden, function(err, politician) {
             if (err) {
+                console.error(err)
                 res.sendStatus(500)
             } else if (politician) {
                 res.json(politician)
@@ -101,6 +103,7 @@ module.exports = function(app, redis) {
 
         redis.hset(redisKeys.politicians, politician.iden, JSON.stringify(politician), function(err, reply) {
             if (err) {
+                console.error(err)
                 res.sendStatus(500)
             } else {
                 res.json(politician)
@@ -111,6 +114,7 @@ module.exports = function(app, redis) {
     app.post('/update-politician', function(req, res) {
         entities.getPolitician(req.body.iden, function(err, politician) {
             if (err) {
+                console.error(err)
                 res.sendStatus(500)
             } else if (politician) {
                 if (politician.iden != req.body.iden) {
@@ -127,6 +131,7 @@ module.exports = function(app, redis) {
 
                 redis.hset(redisKeys.politicians, req.body.iden, JSON.stringify(req.body), function(err, reply) {
                     if (err) {
+                        console.error(err)
                         res.sendStatus(500)
                     } else {
                         res.json(req.body)
@@ -142,6 +147,7 @@ module.exports = function(app, redis) {
     app.post('/list-events', function(req, res) {
         entities.listEvents(function(err, events) {
             if (err) {
+                console.error(err)
                 res.sendStatus(500)
             } else {
                 res.json({
@@ -154,6 +160,7 @@ module.exports = function(app, redis) {
     app.post('/get-event', function(req, res) {
         entities.getEvent(req.body.iden, function(err, event) {
             if (err) {
+                console.error(err)
                 res.sendStatus(500)
             } else if (event) {
                 res.json(event)
@@ -199,6 +206,7 @@ module.exports = function(app, redis) {
 
         async.series(tasks, function(err, results) {
             if (err) {
+                console.error(err)
                 res.sendStatus(500)
             } else {
                 res.json(event)
@@ -210,6 +218,7 @@ module.exports = function(app, redis) {
     app.post('/update-event', function(req, res) {
         entities.getEvent(req.body.iden, function(err, event) {
             if (err) {
+                console.error(err)
                 res.sendStatus(500)
             } else if (event) {
                 if (event.iden != req.body.iden) {
@@ -221,17 +230,45 @@ module.exports = function(app, redis) {
                     return
                 }
 
-                var now = Date.now() / 1000
-                req.body.modified = now
+                var doUpdate = function() {
+                    var now = Date.now() / 1000
+                    req.body.modified = now
 
-                redis.hset(redisKeys.events, req.body.iden, JSON.stringify(req.body), function(err, reply) {
-                    if (err) {
-                        res.sendStatus(500)
-                    } else {
-                        res.json(req.body)
-                        appData.generate()
-                    }
-                })
+                    redis.hset(redisKeys.events, req.body.iden, JSON.stringify(req.body), function(err, reply) {
+                        if (err) {
+                            console.error(err)
+                            res.sendStatus(500)
+                        } else {
+                            res.json(req.body)
+                            appData.generate()
+                        }
+                    })
+                }
+
+                if (event.draft && !req.body.draft) { // Publishing this event
+                    var tasks = []
+                    tasks.push(function(callback) {
+                        redis.lrem(redisKeys.reverseChronologicalEvents, 1, event.iden, function(err, reply) {
+                            callback(err, reply)
+                        })
+                    })
+                    tasks.push(function(callback) {
+                        redis.lpush(redisKeys.reverseChronologicalEvents, event.iden, function(err, reply) {
+                            callback(err, reply)
+                        })
+                    })
+
+                    async.series(tasks, function(err, results) {
+                        if (err) {
+                            console.error(err)
+                            res.sendStatus(500)
+                        } else {
+                            doUpdate()
+                        }
+                    })
+                } else {
+                    doUpdate()
+                }
             } else {
                 res.sendStatus(404)
             }
@@ -241,6 +278,7 @@ module.exports = function(app, redis) {
     app.post('/list-pacs', function(req, res) {
         entities.listPacs(function(err, pacs) {
             if (err) {
+                console.error(err)
                 res.sendStatus(500)
             } else {
                 res.json({
@@ -253,6 +291,7 @@ module.exports = function(app, redis) {
     app.post('/get-pac', function(req, res) {
         entities.getPac(req.body.iden, function(err, pac) {
             if (err) {
+                console.error(err)
                 res.sendStatus(500)
             } else if (pac) {
                 res.json(pac)
@@ -286,6 +325,7 @@ module.exports = function(app, redis) {
 
         redis.hset(redisKeys.pacs, pac.iden, JSON.stringify(pac), function(err, reply) {
             if (err) {
+                console.error(err)
                 res.sendStatus(500)
             } else {
                 res.json(pac)
@@ -296,6 +336,7 @@ module.exports = function(app, redis) {
     app.post('/update-pac', function(req, res) {
         entities.getPac(req.body.iden, function(err, pac) {
             if (err) {
+                console.error(err)
                 res.sendStatus(500)
             } else if (pac) {
                 if (pac.iden != req.body.iden) {
@@ -312,6 +353,7 @@ module.exports = function(app, redis) {
 
                 redis.hset(redisKeys.pacs, req.body.iden, JSON.stringify(req.body), function(err, reply) {
                     if (err) {
+                        console.error(err)
                         res.sendStatus(500)
                     } else {
                         res.json(req.body)

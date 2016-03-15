@@ -159,8 +159,10 @@ var _generate = function(callback) {
             event.supportTotal = Math.floor(amount * support) // Fake
             event.opposeTotal = Math.floor(amount * oppose) // Fake
 
-            politician.supportTotal += event.supportTotal // Fake
-            politician.opposeTotal += event.opposeTotal // Fake
+            if (politician) { // Fake
+                politician.supportTotal += event.supportTotal // Fake
+                politician.opposeTotal += event.opposeTotal // Fake
+            }
 
             maxEventContributionsTotal = Math.max(event.supportTotal + event.opposeTotal, maxEventContributionsTotal)
         })
@@ -181,14 +183,25 @@ var _generate = function(callback) {
 
         var tasks = []
         tasks.push(function(callback) {
-            writeFile(bucket.file('v1/events/recent.json'), JSON.stringify({
+            writeFile(bucket.file('drafts/events/recent.json'), JSON.stringify({
                 'events': events
             }), function(err) {
                 callback(err)
             })
         })
         tasks.push(function(callback) {
-            var sorted = events.slice().sort(function(a, b) {
+            writeFile(bucket.file('v1/events/recent.json'), JSON.stringify({
+                'events': events.filter(function(event) {
+                    return !event.draft
+                })
+            }), function(err) {
+                callback(err)
+            })
+        })
+        tasks.push(function(callback) {
+            var sorted = events.filter(function(event) {
+                return !event.draft
+            }).sort(function(a, b) {
                 var contributionsDiff = (b.supportTotal + b.opposeTotal) - (a.supportTotal + a.opposeTotal)
                 if (contributionsDiff == 0) {
                     return b.created - a.created

@@ -10,6 +10,7 @@
 </head>
 <body>
     <div id="content">
+        <p id="top" style="font-style:italic;"></p>
         <div style="position:relative;width:414px;height:200px;">
             <img id="image" class="pointer" height="100%" width="100%">
             <div id="progress" style="position:absolute;top:0;bottom:0;left:0;right:0;text-align:center;display:none;"></div>
@@ -37,6 +38,9 @@
         </div>
         <p>
             <button id="submit">Create</button>
+        </p>
+        <p>
+            <button id="publish" style="display:none;">Publish</button>
         </p>
         <div id="error"></div>
         <input type="file" id="fileInput" accept="image/jpeg, image/png" style="display:none;">

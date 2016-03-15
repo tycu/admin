@@ -16,6 +16,13 @@ window.onload = function() {
                 div.firstChild.appendChild(space())
                 div.firstChild.appendChild(edit)
 
+                if (event.draft) {
+                    var span = document.createElement('span')
+                    span.style.fontStyle = "italic"
+                    span.textContent = "Draft: "
+                    div.firstChild.insertBefore(span, div.firstChild.firstChild)
+                }
+
                 content.appendChild(div)
             })
         } else {
