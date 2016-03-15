@@ -7,11 +7,27 @@ module.exports = function(redis) {
     var entities = {}
 
     entities.getPolitician = function(iden, callback) {
-        redis.hget(redisKeys.politicians, iden, function(err, reply) {
+        entities.getPoliticians([iden], function(err, politicians) {
+            if (err) {
+                callback(err)
+            } else if (politicians.length > 0) {
+                callback(null, politicians[0])
+            } else {
+                callback()
+            }
+        })
+    }
+
+    entities.getPoliticians = function(idens, callback) {
+        redis.hmget(redisKeys.politicians, idens, function(err, reply) {
             if (err) {
                 callback(err)
             } else if (reply) {
-                callback(null, JSON.parse(reply))
+                var pacs = []
+                reply.forEach(function(json) {
+                    pacs.push(JSON.parse(reply))
+                })
+                callback(null, pacs)
             } else {
                 callback()
             }
@@ -36,11 +52,27 @@ module.exports = function(redis) {
     }
 
     entities.getPac = function(iden, callback) {
-        redis.hget(redisKeys.pacs, iden, function(err, reply) {
+        entities.getPacs([iden], function(err, pacs) {
+            if (err) {
+                callback(err)
+            } else if (pacs.length > 0) {
+                callback(null, pacs[0])
+            } else {
+                callback()
+            }
+        })
+    }
+
+    entities.getPacs = function(idens, callback) {
+        redis.hmget(redisKeys.pacs, idens, function(err, reply) {
             if (err) {
                 callback(err)
             } else if (reply) {
-                callback(null, JSON.parse(reply))
+                var pacs = []
+                reply.forEach(function(json) {
+                    pacs.push(JSON.parse(reply))
+                })
+                callback(null, pacs)
             } else {
                 callback()
             }
@@ -142,38 +174,70 @@ module.exports = function(redis) {
             if (err) {
                 callback(err)
             } else {
-                var contributions = []
+                if (reply.length == 0) {
+                    callback()
+                    return
+                }
 
-                var tasks = []
+                var contributions = []
                 reply.forEach(function(json) {
                     var contribution = JSON.parse(json)
                     contributions.push(contribution)
+                })
 
-                    tasks.push(function(callback) {
-                        entities.getEvent(contribution.event, function(err, event) {
-                            if (err) {
-                                callback(err)
-                            } else {
-                                delete event.supportPacs
-                                delete event.opposePacs
+                // After getting all the contributions we need to look up the events and pacs
 
-                                contribution.event = event
+                var eventIdens = [], pacIdens = []
+                contributions.forEach(function(contribution) {
+                    eventIdens.push(contribution.event)
+                    pacIdens.push(contribution.pac)
+                })
 
-                                entities.getPolitician(event.politician, function(err, politician) {
-                                    event.politician = politician
-                                    callback(err)
-                                })
-                            }
-                        })
-                    })
-                    tasks.push(function(callback) {
-                        entities.getPac(contribution.pac, function(err, pac) {
-                            contribution.pac = pac
+                var tasks = []
+                tasks.push(function(callback) {
+                    entities.getEvents(eventIdens, function(err, events) {
+                        if (err) {
                             callback(err)
-                        })
+                        } else {
+                            var eventsMap = mapifyEntities(events)
+
+                            var politicianIdens = []
+                            events.forEach(function(event) {
+                                politicianIdens.push(event.politician)
+                            })
+
+                            entities.getPoliticians(politicianIdens, function(err, politicians) {
+                                var politiciansMap = mapifyEntities(politicians)
+
+                                events.forEach(function(event) {
+                                    event.politician = politiciansMap[event.politician]
+                                })
+
+                                contributions.forEach(function(contribution) {
+                                    contribution.event = eventsMap[contribution.event]
+                                })
+
+                                callback()
+                            })
+                        }
                     })
                 })
-                
+                tasks.push(function(callback) {
+                    entities.getPacs(pacIdens, function(err, pacs) {
+                        if (err) {
+                            callback(err)
+                        } else {
+                            var pacsMap = mapifyEntities(pacs)
+
+                            contributions.forEach(function(contribution) {
+                                contribution.pac = pacsMap[contribution.pac]
+                            })
+
+                            callback()
+                        }
+                    })
+                })
+
                 async.parallel(tasks, function(err, results) {
                     if (err) {
                         callback(err)
@@ -200,8 +264,8 @@ module.exports = function(redis) {
     return entities
 }
 
-var sortByName = function(items) {
-    return items.sort(function(a, b) {
+var sortByName = function(entities) {
+    return entities.sort(function(a, b) {
         if (a.name > b.name) {
             return 1
         } else if (a.name < b.name) {
@@ -210,4 +274,12 @@ var sortByName = function(items) {
             return 0
         }
     })
+}
+
+var mapifyEntities = function(entities) {
+    var map = {}
+    entities.forEach(function(entity) {
+        map[entity.iden] = entity
+    })
+    return map
 }
