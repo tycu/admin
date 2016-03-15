@@ -217,7 +217,9 @@ var _generate = function(callback) {
             })
         })
         tasks.push(function(callback) {
-            var sorted = politicians.slice().sort(function(a, b) {
+            var sorted = politicians.filter(function(politician) {
+                return politician.supportTotal + politician.opposeTotal > 0
+            }).sort(function(a, b) {
                 return (b.supportTotal + b.opposeTotal) - (a.supportTotal + a.opposeTotal)
             })
 
