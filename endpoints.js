@@ -26,7 +26,7 @@ module.exports = function(app, redis) {
             return
         }
 
-        var fileName = entities.entities.generateIden() + extension
+        var fileName = entities.generateIden() + extension
 
         var bucket = gcloud.storage().bucket('static.tally.us');
         var file = bucket.file('images/' + fileName);
