@@ -114,7 +114,7 @@ var _generate = function(callback) {
                     'iden': politician.iden,
                     'name': politician.name,
                     'jobTitle': politician.jobTitle,
-                    'thumbnailUrl': politician.thumbnailUrl,
+                    'thumbnails': politician.thumbnails,
                     'twitterUsername': politician.twitterUsername,
                     'barWeight': politician.barWeight
                 }
@@ -229,7 +229,7 @@ var _generate = function(callback) {
                     'iden': politician.iden,
                     'name': politician.name,
                     'jobTitle': politician.jobTitle,
-                    'thumbnailUrl': politician.thumbnailUrl,
+                    'thumbnails': politician.thumbnails,
                     'twitterUsername': politician.twitterUsername,
                     'supportTotal': politician.supportTotal,
                     'opposeTotal': politician.opposeTotal,

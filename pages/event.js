@@ -19,7 +19,7 @@ window.onload = function() {
     var event = {}
     var pacs
 
-    var imgixConfig = '?dpr=' + devicePixelRatio + '&h=' + image.clientHeight + '&w=' + image.clientWidth + '&fit=crop'
+    var imgixConfig = '?dpr=2&h=' + image.clientHeight + '&w=' + image.clientWidth + '&fit=crop'
 
     if (location.query['iden']) {
         document.title = 'Update Event ' + location.query['iden'] + ' - Tally'
@@ -195,7 +195,7 @@ window.onload = function() {
     }
 
     publish.onclick = function() {
-        event.draft = false
+        delete event.draft
         submit.click()
     }
 

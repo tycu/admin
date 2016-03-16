@@ -10,16 +10,16 @@
 </head>
 <body>
     <div id="content">
-        <div style="position:relative;width:100px;height:100px;">
-            <img id="thumbnail" class="pointer" height="100%" width="100%">
-            <div id="progress" style="position:absolute;top:0;bottom:0;left:0;right:0;text-align:center;display:none;"></div>
+        <div id="thumbnails" style="height:100px;">
+            <div style="float:left;line-height:100px;margin:0 10px;">
+                <button id="addThumbnail">Add</button>
+            </div>
         </div>
         <input type="text" id="name" placeholder="Name">
         <input type="text" id="jobTitle" placeholder="Job title">
         <input type="text" id="twitterUsername" placeholder="Twitter username">
         <button id="submit">Create</button>
         <div id="error"></div>
-        <input type="file" id="fileInput" accept="image/jpeg, image/png" style="display:none;">
     </div>
 </body>
 </html>
