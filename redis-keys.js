@@ -21,6 +21,14 @@ module.exports = {
     'userReverseChronologicalContributions': function(userIden) {
         return 'user_' + userIden + '_reverse_chronological_contributions'
     },
+    'contributionsToday': function() {
+        var date = new Date()
+        date.setUTCHours(0, 0, 0, 0) // UTC Midnight
+        return date.getTime() / 1000 + '_contributions'
+    },
+    'contributionsOnDay': function(utcTimestamp) {
+        return utcTimestamp + '_contributions'
+    },
     
     // Hashes with 2 fields, support & oppose
     'eventContributionTotals': function(eventIden) {

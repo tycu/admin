@@ -10,6 +10,22 @@ module.exports = function(redis) {
         return Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
     }
 
+    entities.getUsers = function(idens, callback) {
+        redis.hmget(redisKeys.users, idens, function(err, reply) {
+            if (err) {
+                callback(err)
+            } else if (reply) {
+                var pacs = []
+                reply.forEach(function(json) {
+                    pacs.push(JSON.parse(json))
+                })
+                callback(null, pacs)
+            } else {
+                callback()
+            }
+        })
+    }
+
     entities.getPolitician = function(iden, callback) {
         entities.getPoliticians([iden], function(err, politicians) {
             if (err) {
@@ -29,7 +45,7 @@ module.exports = function(redis) {
             } else if (reply) {
                 var pacs = []
                 reply.forEach(function(json) {
-                    pacs.push(JSON.parse(reply))
+                    pacs.push(JSON.parse(json))
                 })
                 callback(null, pacs)
             } else {
@@ -74,7 +90,7 @@ module.exports = function(redis) {
             } else if (reply) {
                 var pacs = []
                 reply.forEach(function(json) {
-                    pacs.push(JSON.parse(reply))
+                    pacs.push(JSON.parse(json))
                 })
                 callback(null, pacs)
             } else {
