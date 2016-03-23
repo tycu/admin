@@ -1,6 +1,7 @@
 'use strict'
 
 var async = require("async")
+var request = require('request')
 var redisKeys = require('./redis-keys')
 
 var gcloud = require('gcloud')({
@@ -50,7 +51,36 @@ module.exports = function(app, redis) {
             return
         }
 
-        res.json({})
+        var notification = {
+            'body': req.body.message,
+            'sound': 'default',
+            'badge': 1
+        }
+
+        var data = {
+            'event': req.body.event
+        }
+
+        request.post({
+            'url': 'https://gcm-http.googleapis.com/gcm/send',
+            'headers': {
+                'Content-Type': 'application/json',
+                'Authorization':'key=AIzaSyAi9zkqOdTo0YrX9HI-SH3ZQ_Y4SIdtdGo'
+            },
+            'json': {
+                'to': '/topics/broadcasts',
+                'priority': 'high',
+                'notification': notification,
+                'data': data
+            }
+        }, function(err, _, body) {
+            if (err) {
+                res.sendStatus(500)
+            } else {
+                console.log('gcm success', body)
+                res.json({})
+            }
+        })
     })
 
     app.post('/get-contribution-report', function(req, res) {
