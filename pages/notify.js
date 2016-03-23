@@ -14,7 +14,7 @@ window.onload = function() {
             initial.value = ''
             events.options.add(initial)
 
-            res.events.forEach(function(event) {
+            res.events.slice(0, 10).forEach(function(event) {
                 var option = document.createElement('option')
                 option.text = event.headline
                 option.value = event.iden
