@@ -11,8 +11,11 @@ window.onload = function() {
                 edit.style.fontWeight = 'bold'
                 edit.textContent = 'Edit'
 
+                var headline = document.createElement('p')
+                headline.textContent = (event.headline || '<no headline>')
+
                 var div = document.createElement('div')
-                div.innerHTML = markdown.toHTML(event.headline || '<no headline>')
+                div.appendChild(headline)
                 div.firstChild.appendChild(space())
                 div.firstChild.appendChild(edit)
 
