@@ -29,6 +29,9 @@ module.exports = {
     'contributionsOnDay': function(utcTimestamp) {
         return utcTimestamp + '_contributions'
     },
+
+    // Sorted sets
+    'eventsSortedByContributionSums': 'events_sorted_by_contribution_sums',
     
     // Hashes with 2 fields, support & oppose
     'eventContributionTotals': function(eventIden) {
@@ -41,6 +44,6 @@ module.exports = {
     // Sum of all contributions
     'contributionsSum': 'contributions_sum',
     'userContributionsSum': function(userIden) {
-        return 'user_' + userIden + '_contribution_sum'
+        return 'user_' + userIden + '_contributions_sum'
     }
 }

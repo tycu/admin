@@ -92,13 +92,15 @@ module.exports = function(app, redis) {
         var date = new Date(req.body.date * 1000)
 
         var dates = []
-        for (var i = 0; i < 7; i++) {
+        for (var i = 0; i < 8; i++) {
             var day = date.getUTCDay()
             while (date.getUTCDay() == day) {
                 date.setTime(date.getTime() - (60 * 60 * 1000))
             }
             date.setUTCHours(0, 0, 0, 0)
-            dates.push(date / 1000)
+            if (i > 0) {
+                dates.push(date / 1000)
+            }
         }
 
         var tasks = []
