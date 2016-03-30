@@ -8,8 +8,6 @@ window.onload = function() {
             'date': location.query['date']
         }, function(res) {
             if (res) {
-                console.log(res)
-
                 var p = document.createElement('p')
                 p.textContent = 'Contribution Report for ' + moment.utc(location.query['date'] * 1000).format('dddd, MMMM Do YYYY') + ':'
                 p.style.fontWeight = 'bold'
@@ -49,6 +47,12 @@ window.onload = function() {
 
                     content.appendChild(p)
                 })
+
+                if (Object.keys(pacs).length == 0) {
+                    var p = document.createElement('p')
+                    p.textContent = 'No contributions'
+                    content.appendChild(p)
+                }
             } else {
                 content.innerHTML = 'Unable to load report'
             }
