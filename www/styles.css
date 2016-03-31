@@ -8,7 +8,6 @@ body {
     font-size: 16px;
     color: #212121;
     background-color: #fafafa;
-    overflow: hidden;
 }
 img {
     border: 0;
@@ -91,6 +90,98 @@ a {
     margin: 0px auto;
     position: relative;
 }
+.event-row {
+    padding: 16px 0;
+    overflow: hidden;
+}
+.event-image {
+    display: block;
+    float: left;
+    width: 320px;
+    height: 180px;
+    border-radius: 8px;
+}
+.event-content {
+    margin-left: 320px;
+    padding: 2px 0 8px 16px;
+}
+.event-headline {
+    margin: 0;
+    font-size: 20px;
+}
+.event-graph {
+    margin: 16px 0 8px 0;
+    color: white;
+    overflow: hidden;
+}
+.oppose-holder {
+    float: left;
+    width: 50%;
+    line-height: 24px;
+}
+.support-holder {   
+    margin-left: 50%;
+    width: 50%;
+    line-height: 24px;
+}
+.oppose-bar {
+    float: right;
+    min-width: 66%;
+    background-color: #EC2153;
+    opacity: 0.5;
+    padding: 0 6px;
+}
+.support-bar {
+    float: left;
+    text-align: right;
+    min-width: 33%;
+    background-color: #EC2153;
+    opacity: 0.8;
+    padding: 0 6px;
+}
+.scoreboard-row {
+    overflow: hidden;
+    padding: 16px 0;
+}
+.scoreboard-image {
+    display: block;
+    float: left;
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+}
+.scoreboard-content {
+    margin-left: 80px;
+    padding: 0 0 0 16px;
+}
+.scoreboard-text {
+    float: left;
+    width: 40%;
+    font-size: 20px;
+    padding-right: 16px;
+}
+.politician-name {
+    margin: 12px 0 0 0;
+    line-height: 28px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.politician-title {
+    color: #9F9F9F;
+    margin: 0;
+    line-height: 28px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.scoreboard-graph {
+    width: 60%;
+    margin-left: 40%;
+    padding-top: 23px;
+    color: white;
+    overflow: hidden;
+}
 
 @media only screen and (max-device-width: 768px) {
     #appbar {
@@ -112,5 +203,88 @@ a {
     }
     #footer a {
         margin: 12px;
+    }
+    .event-row {
+        padding: 0;
+        overflow: hidden;
+    }
+    .event-image {
+        display: block;
+        float: none;
+        width: 100%;
+        height: inherit;
+        border-radius: 8px;
+    }
+    .event-content {
+        margin: 0;
+        padding: 8px 0 24px 0;
+    }
+    .event-headline {
+        margin: 0;
+        font-size: 18px;
+    }
+    .event-graph {
+        font-size: 13px;
+    }
+    .oppose-holder {
+        line-height: 18px;
+    }
+    .support-holder {   
+        line-height: 18px;
+    }
+    .oppose-bar {
+        padding: 0 4px;
+    }
+    .support-bar {
+        padding: 0 4px;
+    }
+    .scoreboard-row {
+        overflow: hidden;
+        padding: 0;
+        position: relative;
+    }
+    .scoreboard-image {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 56px;
+        height: 56px;
+        border-radius: 8px;
+    }
+    .scoreboard-content {
+        margin-left: 0;
+        padding: 0;
+    }
+    .scoreboard-text {
+        width: auto;
+        float: none;
+        height: 56px;
+        margin-left: 56px;
+        font-size: 16px;
+        padding-left: 16px;
+        padding-right: 0;
+    }
+    .politician-name {
+        margin: 8px 0 0 0;
+        line-height: 20px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .politician-title {
+        color: #9F9F9F;
+        margin: 0;
+        line-height: 20px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .scoreboard-graph {
+        width: auto;
+        margin-left: 0;
+        padding-top: 0;
+        padding-bottom: 16px;
+        font-size: 13px;
     }
 }
