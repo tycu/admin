@@ -146,6 +146,21 @@ module.exports = function(app, redis) {
         })
     })
 
+    app.post('/set-pinned-event', function(req, res) {
+        if (!req.body.event) {
+            res.sendStatus(400)
+            return
+        }
+
+        redis.set(redisKeys.pinnedEventIden, req.body.event, function(err, reply) {
+            if (err) {
+                res.sendStatus(500)
+            } else {
+                res.json({})
+            }
+        })
+    })
+
     app.post('/list-politicians', function(req, res) {
         entities.listPoliticians(function(err, politicians) {
             if (err) {

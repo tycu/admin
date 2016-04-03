@@ -7,13 +7,14 @@ window.onload = function() {
         if (res) {
             res.politicians.forEach(function(politician) {
                 var p = document.createElement('p')
-                p.textContent = politician.name + ' '
+                p.textContent = politician.name
 
                 var edit = document.createElement('a')
                 edit.href = '/politician.html?iden=' + politician.iden
                 edit.style.fontWeight = 'bold'
                 edit.textContent = 'Edit'
 
+                p.appendChild(space(2))
                 p.appendChild(edit)
 
                 var div = document.createElement('div')

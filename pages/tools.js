@@ -2,9 +2,18 @@
 
 NodeList.prototype.forEach = Array.prototype.forEach
 
-var space = function() {
+var space = function(count) {
+    if (!count) {
+        count = 1
+    }
+
     var span = document.createElement('span')
-    span.textContent = ' '
+    span.textContent = ''
+    span.style.whiteSpace = 'pre'
+    for (var i = 0; i < count; i++) {
+        span.textContent += ' '
+    }
+
     return span
 }
 

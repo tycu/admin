@@ -16,6 +16,8 @@ module.exports = {
     // Payments
     'userIdenToStripeCustomerId': 'user_iden_to_stripe_customer_id',
 
+    'pinnedEventIden': 'pinned_event_iden',
+
     // Lists
     'reverseChronologicalEvents': 'reverse_chronological_events',
     'userReverseChronologicalContributions': function(userIden) {

@@ -162,14 +162,43 @@ module.exports = function(redis) {
     }
 
     entities.listEvents = function(callback) {
-        redis.lrange(redisKeys.reverseChronologicalEvents, 0, -1, function(err, reply) {
+        var tasks = []
+        tasks.push(function(callback) {
+            redis.lrange(redisKeys.reverseChronologicalEvents, 0, -1, function(err, reply) {
+                callback(err, reply)
+            })
+        })
+        tasks.push(function(callback) {
+            redis.get(redisKeys.pinnedEventIden, function(err, reply) {
+                callback(err, reply)
+            })
+        })
+
+        async.parallel(tasks, function(err, results) {
             if (err) {
                 callback(err)
             } else {
-                entities.getEvents(reply, function(err, events) {
+                var idens = results[0]
+                var pinned = results[1]
+
+                if (pinned) {
+                    var index = idens.indexOf(pinned)
+                    if (index != -1) {
+                        idens.splice(index, 1)
+                    }
+                    idens.unshift(pinned)
+                }
+
+                entities.getEvents(idens, function(err, events) {
                     if (err) {
                         callback(err)
                     } else {
+                        if (pinned) {
+                            if (events[0].iden == pinned) {
+                                events[0].pinned = true
+                            }
+                        }
+
                         callback(null, events)
                     }
                 })
