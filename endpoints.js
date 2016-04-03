@@ -157,6 +157,7 @@ module.exports = function(app, redis) {
                 res.sendStatus(500)
             } else {
                 res.json({})
+                appData.generate()
             }
         })
     })
