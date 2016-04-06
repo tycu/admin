@@ -20,7 +20,7 @@ window.onload = function() {
     var event = {}
     var pacs
 
-    var imgixConfig = '?dpr=2&h=' + image.clientHeight + '&w=' + image.clientWidth + '&fit=crop'
+    var imgixConfig = '?w=818&fit=crop'
 
     if (location.query['iden']) {
         document.title = 'Update Event ' + location.query['iden'] + ' - Tally'
