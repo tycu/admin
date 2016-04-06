@@ -233,8 +233,8 @@ window.onload = function() {
 
         event.imageAttribution = imageAttribution.value
         event.politician = politicians.value
-        event.headline = headline.value || ''
-        event.summary = summary.value || ''
+        event.headline = headline.value
+        event.summary = summary.value
         event.tweets = tweets
 
         if (support.length > 0) {

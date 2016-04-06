@@ -129,7 +129,8 @@ var _generate = function(callback) {
                             'iden': pac.iden,
                             'name': pac.name,
                             'description': pac.description,
-                            'color': pac.color
+                            'color': pac.color,
+                            'twitterUsername': pac.twitterUsername
                         })
                     }
                 })
@@ -145,7 +146,8 @@ var _generate = function(callback) {
                             'iden': pac.iden,
                             'name': pac.name,
                             'description': pac.description,
-                            'color': pac.color
+                            'color': pac.color,
+                            'twitterUsername': pac.twitterUsername
                         })
                     }
                 })

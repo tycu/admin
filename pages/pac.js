@@ -4,6 +4,7 @@ window.onload = function() {
     var content = document.getElementById('content')
     var name = document.getElementById('name')
     var description = document.getElementById('description')
+    var twitterUsername = document.getElementById('twitterUsername')
     var color = document.getElementById('color')
     var submit = document.getElementById('submit')
     var error = document.getElementById('error')
@@ -22,6 +23,7 @@ window.onload = function() {
                 document.title = 'Update ' + pac.name + ' - Tally'
                 name.value = pac.name || ''
                 description.value = pac.description || ''
+                twitterUsername.value = pac.twitterUsername || ''
                 color.value = pac.color
                 submit.disabled = false
                 content.style.display = 'block'
@@ -38,6 +40,7 @@ window.onload = function() {
         pac.name = name.value
         pac.description = description.value
         pac.color = color.value
+        pac.twitterUsername = twitterUsername.value
 
         var endpoint = pac.iden ? '/update-pac' : '/create-pac'
         post(endpoint, pac, function(res) {
