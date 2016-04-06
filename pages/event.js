@@ -12,6 +12,8 @@ window.onload = function() {
     var supportOptions = document.getElementById('supportOptions')
     var addOppose = document.getElementById('addOppose')
     var opposeOptions = document.getElementById('opposeOptions')
+    var supportTweet = document.getElementById('supportTweet')
+    var opposeTweet = document.getElementById('opposeTweet')
     var submit = document.getElementById('submit')
     var publish = document.getElementById('publish')
     var error = document.getElementById('error')
@@ -62,6 +64,8 @@ window.onload = function() {
                                 summary.value = event.summary || ''
                                 image.src = event.imageUrl && event.imageUrl + imgixConfig || ''
                                 imageAttribution.value = event.imageAttribution || ''
+                                supportTweet.value = event.supportTweet || ''
+                                opposeTweet.value = event.opposeTweet || ''
 
                                 if (event.supportPacs) {
                                     event.supportPacs.forEach(function(pacIden) {
@@ -219,6 +223,8 @@ window.onload = function() {
         event.politician = politicians.value
         event.headline = headline.value || ''
         event.summary = summary.value || ''
+        event.supportTweet = supportTweet.value || ''
+        event.opposeTweet = opposeTweet.value || ''
 
         if (support.length > 0) {
             event.supportPacs = support

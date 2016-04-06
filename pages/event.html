@@ -17,25 +17,35 @@
         </div>
         <input type="text" id="imageAttribution" placeholder="Photo attribution">
         <p>
-            Politician:
+            <b>Politician:</b>
             <select id="politicians"></select>
         </p>
+        <p><b>Headline:</b></p>
         <textarea id="headline" placeholder="Hed"></textarea>
+        <p><b>Summary:</b></p>
         <textarea id="summary" placeholder="Dek"></textarea>
+        <br>
         <div>
             <p>
-                Support:
+                <b>Support:</b>
                 <button id="addSupport">Add</button>
             </p>
             <div id="supportOptions" style="margin-left:30px;"></div>
         </div>
         <div>
             <p>
-                Oppose:
+                <b>Oppose:</b>
                 <button id="addOppose">Add</button>
             </p>
             <div id="opposeOptions" style="margin-left:30px;"></div>
         </div>
+        <br>
+        <p>Tweets will start with ".@politician " automatically</p>
+        <p><b>Support tweet:</b></p>
+        <textarea id="supportTweet" placeholder=""></textarea>
+        <p><b>Oppose tweet:</b></p>
+        <textarea id="opposeTweet" placeholder=""></textarea>
+        <br>
         <p>
             <button id="submit">Create</button>
         </p>
