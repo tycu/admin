@@ -6,6 +6,7 @@ window.onload = function() {
     var image = document.getElementById('image')
     var imageAttribution = document.getElementById('imageAttribution')
     var politicians = document.getElementById('politicians')
+    var politicianTwitter = document.getElementById('politicianTwitter')
     var headline = document.getElementById('headline')
     var summary = document.getElementById('summary')
     var addSupport = document.getElementById('addSupport')
@@ -35,12 +36,25 @@ window.onload = function() {
             initial.value = ''
             politicians.options.add(initial)
 
+            var politicianMap = {}
+
             res.politicians.forEach(function(politician) {
+                politicianMap[politician.iden] = politician
+
                 var option = document.createElement('option')
                 option.text = politician.name
                 option.value = politician.iden
                 politicians.options.add(option)
             })
+
+            politicians.onchange = function(e) {
+                var politician = politicianMap[politicians.value]
+                if (politician) {
+                    politicianTwitter.textContent = '@' + politician.twitterUsername
+                } else {
+                    politicianTwitter.textContent = ''
+                }
+            }
 
             post('/list-pacs', null, function(res) {
                 if (res) {
@@ -67,7 +81,8 @@ window.onload = function() {
                                     event.supportPacs.forEach(function(pacIden) {
                                         var select = createPacSelect()
                                         select.firstChild.value = pacIden
-                                        select.children[2].value = (event.tweets && event.tweets[pacIden]) || ''
+                                        select.firstChild.onchange()
+                                        select.children[5].value = (event.tweets && event.tweets[pacIden]) || ''
                                         supportOptions.appendChild(select)
                                     })
                                 }
@@ -76,7 +91,8 @@ window.onload = function() {
                                     event.opposePacs.forEach(function(pacIden) {
                                         var select = createPacSelect()
                                         select.firstChild.value = pacIden
-                                        select.children[2].value = (event.tweets && event.tweets[pacIden]) || ''
+                                        select.firstChild.onchange()
+                                        select.children[5].value = (event.tweets && event.tweets[pacIden]) || ''
                                         opposeOptions.appendChild(select)
                                     })
                                 }
@@ -145,10 +161,14 @@ window.onload = function() {
         initial.value = ''
         pacSelect.options.add(initial)
 
-        pacs.forEach(function(pacs) {
+        var pacMap = {}
+
+        pacs.forEach(function(pac) {
+            pacMap[pac.iden] = pac
+
             var option = document.createElement('option')
-            option.text = pacs.name
-            option.value = pacs.iden
+            option.text = pac.name
+            option.value = pac.iden
             pacSelect.options.add(option)
         })
 
@@ -158,7 +178,21 @@ window.onload = function() {
             p.parentNode.removeChild(p)
         }
 
+        var span = document.createElement('span')
+
+        pacSelect.onchange = function(e) {
+            var pac = pacMap[pacSelect.value]
+            if (pac && pac.twitterUsername) {
+                span.textContent = '@' + pac.twitterUsername
+            } else {
+                span.textContent = ''
+            }
+        }
+
         p.appendChild(pacSelect)
+        p.appendChild(space())
+        p.appendChild(span)
+        p.appendChild(space())
         p.appendChild(remove)
         
         var tweet = document.createElement('textarea')
@@ -216,7 +250,7 @@ window.onload = function() {
         supportOptions.childNodes.forEach(function(node) {
             if (node.firstChild.value) {
                 support.push(node.firstChild.value)
-                if (node.childNodes[2].value) {
+                if (node.childNodes[5].value) {
                     tweets[node.firstChild.value] = node.childNodes[2].value
                 }
             }
@@ -225,7 +259,7 @@ window.onload = function() {
         opposeOptions.childNodes.forEach(function(node) {
             if (node.firstChild.value) {
                 oppose.push(node.firstChild.value)
-                if (node.childNodes[2].value) {
+                if (node.childNodes[5].value) {
                     tweets[node.firstChild.value] = node.childNodes[2].value
                 }
             }
