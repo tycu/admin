@@ -17,15 +17,15 @@ var start = function() {
     }
 
     // Redirect to HTTPS in production
-    if (process.env.NODE_ENV == 'production') {
-        app.use(function(req, res, next) {
-            if (req.headers['x-forwarded-proto'] !== 'https') {
-                res.redirect(301, 'https://' + req.get('Host') + req.url)
-            } else {
-                next()
-            }
-        })
-    }
+    // if (process.env.NODE_ENV == 'production') {
+    //     app.use(function(req, res, next) {
+    //         if (req.headers['x-forwarded-proto'] !== 'https') {
+    //             res.redirect(301, 'https://' + req.get('Host') + req.url)
+    //         } else {
+    //             next()
+    //         }
+    //     })
+    // }
 
     app.use(require('body-parser').json())
 
