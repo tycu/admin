@@ -1,6 +1,7 @@
 {
   "name": "tally-admin",
   "version": "1.0.0",
+  "description": "tally admin tool",
   "dependencies": {
     "async": "^1.5.2",
     "body-parser": "^1.15.0",
@@ -18,5 +19,7 @@
   },
   "scripts": {
     "start": "node main.js"
-  }
+  },
+  "private": true,
+  "license": "UNLICENSED"
 }
